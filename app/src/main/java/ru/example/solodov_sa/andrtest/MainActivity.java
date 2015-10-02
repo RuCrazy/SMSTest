@@ -27,7 +27,10 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,7 +45,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     float Sum;
 
     ArrayAdapter<String> smsadapter;
-    String Sender, ReqDate, TxtMask, AppDataPath;
+    String Sender, ReqDate, TxtMask, AppDataPath, FilePath;
 
     TextView lblMsg, lblNo;
     ListView lvMsg,lvItems;
@@ -81,6 +84,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         cur_month = 6;
         cur_day = 1;
         Sum = 0;
+
+        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Settings.txt" ;
 
 
         MyTV2.setText(ReqDate);
@@ -188,8 +193,31 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 Environment.MEDIA_MOUNTED)) {
             Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
             return;
+        } else {
+
+            File fhandle = new File(FilePath);
+            try
+            {
+                //Если нет директорий в пути, то они будут созданы:
+                if (!fhandle.getParentFile().exists())
+                    fhandle.getParentFile().mkdirs();
+                //Если файл существует, то он будет перезаписан:
+                fhandle.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(fhandle);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+                myOutWriter.write("Test");
+                myOutWriter.close();
+                fOut.close();
+            }
+            catch (IOException e)
+            {
+                //e.printStackTrace();
+                Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            Toast.makeText(this, "Файл записан на SD-карту", Toast.LENGTH_LONG).show();
         }
-        Toast.makeText(this, "Файл записан на SD-карту", Toast.LENGTH_LONG).show();
+
 
 
     }
