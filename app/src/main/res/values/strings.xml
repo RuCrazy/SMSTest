@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AndrTest</string>
+
+    <string name="file_save">Сохранить настройки</string>
+    <string name="file_read">Загрузить настройки</string>
+    <string name="action_settings">Settings</string>
+</resources>

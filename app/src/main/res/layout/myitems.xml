@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/custom_border">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:text="Name">
+    </TextView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvName">
+        <TextView
+            android:id="@+id/tvSum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginLeft="20dp"
+            android:layout_weight = "3"
+            android:textSize="17dp"
+            android:text="Sum">
+        </TextView>
+        <View
+            android:layout_alignLeft="@+id/tvSum"
+            android:layout_height="match_parent"
+            android:background="@drawable/custom_separator"
+            android:layout_width="1dp">
+        </View>
+
+        <TextView
+            android:id="@+id/tvSmsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="SmsCount"
+            android:layout_alignTop="@+id/tvSum"
+            android:layout_alignParentRight="true"
+            android:textSize="17dp"
+            android:layout_weight = "1"
+            android:layout_marginRight="20dp"
+            android:paddingLeft="3dp"
+            android:layout_alignParentEnd="true">
+        </TextView>
+
+    </LinearLayout>
+    <View
+        android:layout_below="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:background="@drawable/custom_separator"
+        android:layout_height="1dp" />
+
+</RelativeLayout>
