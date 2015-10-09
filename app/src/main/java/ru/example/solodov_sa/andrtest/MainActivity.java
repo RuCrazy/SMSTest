@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     float Sum;
 
     ArrayAdapter<String> smsadapter;
-    String Sender, ReqDate, TxtMask, AppDataPath, FilePath;
+    String Sender, ReqDate, TxtMask, FilePath;
 
     TextView lblMsg, lblNo;
     ListView lvMsg,lvItems;
@@ -85,7 +85,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         cur_day = 1;
         Sum = 0;
 
-        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Settings.txt" ;
+        FilePath = getExternalFilesDir(null).toString()+ "/Settings.txt" ;
 
 
         MyTV2.setText(ReqDate);
@@ -94,8 +94,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         GetSMS();
         ReadData();
 
-        AppDataPath = getExternalFilesDir(null).toString();
-        MyTV.setText(AppDataPath);
+         MyTV.setText(FilePath);
 
         //Нажатие на кнопку "Отбор"
         View.OnClickListener oclBtn1 = new View.OnClickListener() {
@@ -172,20 +171,46 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     }
     //чтение файла с настройками
     private void ReadData() {
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            //factory.setNamespaceAware(true); // если используется пространство имён
-            XmlPullParser parser = factory.newPullParser();
-            File file = new File(AppDataPath + "/Data.xml");
-            FileInputStream fis = new FileInputStream(file);
-            parser.setInput(new InputStreamReader(fis));
+        if (!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
+            return;
+        } else {
 
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(this, "XML Pasing Excpetion = " + e, Toast.LENGTH_LONG).show();
-        }
+            File fhandle = new File(FilePath);
+            try
+            {
+                //Если нет директорий в пути, то они будут созданы:
+                if (!fhandle.getParentFile().exists()) {
+                    fhandle.getParentFile().mkdirs();
+                }
+                //Если файл существует, то он будет перезаписан:
+                fhandle.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(fhandle);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
 
+                String LS = "\r\n";
+                myOutWriter.write(String.valueOf(MyItems.size()));
+                //Перебираем все элементы MyItems и записываем значения в файл
+                for (int i = 0; i < MyItems.size(); i++){
+                    myOutWriter.write(LS + MyItems.get(i).Name);
+                    myOutWriter.write(LS + MyItems.get(i).SmsCount);
+                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
+                    for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
+                        myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
+                    }
+                }
+                myOutWriter.close();
+                fOut.close();
+
+                Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
+            }
+            catch (IOException e)
+            {
+                //e.printStackTrace();
+                Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+            }
+       }
     }
     //Запись файла с настройками
     private void SaveData() {
@@ -199,15 +224,29 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             try
             {
                 //Если нет директорий в пути, то они будут созданы:
-                if (!fhandle.getParentFile().exists())
+                if (!fhandle.getParentFile().exists()) {
                     fhandle.getParentFile().mkdirs();
+                }
                 //Если файл существует, то он будет перезаписан:
                 fhandle.createNewFile();
                 FileOutputStream fOut = new FileOutputStream(fhandle);
                 OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-                myOutWriter.write("Test");
+
+                String LS = "\r\n";
+                myOutWriter.write(String.valueOf(MyItems.size()));
+                //Перебираем все элементы MyItems и записываем значения в файл
+                for (int i = 0; i < MyItems.size(); i++){
+                    myOutWriter.write(LS + MyItems.get(i).Name);
+                    myOutWriter.write(LS + MyItems.get(i).SmsCount);
+                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
+                    for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
+                        myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
+                    }
+                }
                 myOutWriter.close();
                 fOut.close();
+
+                Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
             }
             catch (IOException e)
             {
@@ -215,7 +254,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
             }
 
-            Toast.makeText(this, "Файл записан на SD-карту", Toast.LENGTH_LONG).show();
+
         }
 
 
