@@ -25,10 +25,13 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
@@ -52,6 +55,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     private int cur_year, cur_month, cur_day;
 
+    ArrayList<String> msgData;
+
     ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     myItemsAdapter ItemsAdapter;
 
@@ -65,7 +70,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         lvItems.setAdapter(ItemsAdapter);
         lvItems.setDivider(getResources().getDrawable(android.R.color.transparent));
 
-        final ArrayList<String> msgData = new ArrayList<String>();
         smsadapter = new ArrayAdapter<String>(this, R.layout.sms_list, msgData);
         lvMsg = (ListView) findViewById(R.id.lvMsg);
         lvMsg.setAdapter(smsadapter);
@@ -94,47 +98,14 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         GetSMS();
         ReadData();
 
-         MyTV.setText(FilePath);
+        // MyTV.setText(FilePath);
 
         //Нажатие на кнопку "Отбор"
         View.OnClickListener oclBtn1 = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                String str, str2;
-                int j = 0;
-                str2 = "";
-                int k;
-                int l;
-                Sum = 0;
-                TxtMask = MyTxt.getText().toString();
-                TxtMask = TxtMask.toLowerCase();
-
-                if (!TxtMask.equals("")) {
-                    for (int i = 0; i < msgData.size(); i++) {
-                        str = msgData.get(i);
-                        str = str.toLowerCase();
-
-                        if (str.indexOf(TxtMask) > 0) {
-                            j++;
-                            k = str.indexOf("покупка");
-                            if (k > -1) {
-                                k = k + 8;
-                                l = str.indexOf("р");
-                                Sum = Sum + Float.parseFloat(str.substring(k, l));
-                                str2 = str.substring(k, l);
-
-                            }
-
-
-                        }
-                    }
-                    //lvMsg.setAdapter(cursor);
-                    MyTV.setText("Найдено " + j + " SMS с ключом: " + TxtMask + "\n" + Sum + " р.");
-                    ArrayList<String> MA = new ArrayList<String>();
-                    MA.add(TxtMask);
-                    MyItems.add(new MyItem(TxtMask, MA, Sum, j));
-                }
+                FindSMS(MyTxt.getText().toString());
             }
         };
         myBtn.setOnClickListener(oclBtn1);
@@ -169,6 +140,44 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         myBtn3.setOnClickListener(oclBtn3);
 
     }
+    private void FindSMS(String Text){
+        // TODO Auto-generated method stub
+        String str, str2;
+        int j = 0;
+        str2 = "";
+        int k;
+        int l;
+        Sum = 0;
+        TxtMask = Text;
+        TxtMask = TxtMask.toLowerCase();
+
+        if (!TxtMask.equals("")) {
+            for (int i = 0; i < msgData.size(); i++) {
+                str = msgData.get(i);
+                str = str.toLowerCase();
+
+                if (str.indexOf(TxtMask) > 0) {
+                    j++;
+                    k = str.indexOf("покупка");
+                    if (k > -1) {
+                        k = k + 8;
+                        l = str.indexOf("р");
+                        Sum = Sum + Float.parseFloat(str.substring(k, l));
+                        str2 = str.substring(k, l);
+
+                    }
+
+
+                }
+            }
+            //lvMsg.setAdapter(cursor);
+            MyTV.setText("Найдено " + j + " SMS с ключом: " + TxtMask + "\n" + Sum + " р.");
+           // ArrayList<String> MA = new ArrayList<String>();
+           // MA.add(TxtMask);
+           // MyItems.add(new MyItem(TxtMask, MA, Sum, j));
+        }
+    }
+
     //чтение файла с настройками
     private void ReadData() {
         if (!Environment.getExternalStorageState().equals(
@@ -176,39 +185,50 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
             return;
         } else {
-
             File fhandle = new File(FilePath);
-            try
-            {
-                //Если нет директорий в пути, то они будут созданы:
-                if (!fhandle.getParentFile().exists()) {
-                    fhandle.getParentFile().mkdirs();
-                }
-                //Если файл существует, то он будет перезаписан:
-                fhandle.createNewFile();
-                FileOutputStream fOut = new FileOutputStream(fhandle);
-                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            try {
+                FileInputStream inStream = new FileInputStream(fhandle);
 
-                String LS = "\r\n";
-                myOutWriter.write(String.valueOf(MyItems.size()));
-                //Перебираем все элементы MyItems и записываем значения в файл
-                for (int i = 0; i < MyItems.size(); i++){
-                    myOutWriter.write(LS + MyItems.get(i).Name);
-                    myOutWriter.write(LS + MyItems.get(i).SmsCount);
-                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
-                    for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
-                        myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
+                if ( inStream != null ) {
+                    MyItems.clear();
+                    InputStreamReader inputStreamReader = new InputStreamReader(inStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    String receiveString = "";
+                    //StringBuilder stringBuilder = new StringBuilder();
+
+                    while ( (receiveString = bufferedReader.readLine()) != null ) {
+                        //stringBuilder.append(receiveString);
+                        int num = Integer.parseInt(receiveString.toString());
+                        if (num != 0){
+                            for (int i = 0; i <= num-1; i++) {
+                                String name = bufferedReader.readLine();
+                                int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
+                                Float sum = Float.parseFloat(bufferedReader.readLine().toString());
+                                ArrayList<String> MA = new ArrayList<String>();
+                                int num2 = Integer.parseInt(bufferedReader.readLine().toString());
+                                for (int j = 0; j <= num2-1; j++) {
+                                    MA.add(bufferedReader.readLine().toString());
+                                    FindSMS(MA.get(j));
+                                }
+                               // MyItems.add(new MyItem(name, MA, sum, SmsCount));
+                            }
+
+                        }
+
                     }
-                }
-                myOutWriter.close();
-                fOut.close();
 
-                Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
+                    inStream.close();
+                    //ret = stringBuilder.toString();
+                }
+
             }
-            catch (IOException e)
-            {
-                //e.printStackTrace();
-                Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+            catch (FileNotFoundException e) {
+                //Log.e("login activity", "File not found: " + e.toString());
+                Toast.makeText(this, "Файл с настройками не найден: " + e.toString(), Toast.LENGTH_LONG).show();
+                MyTV.setText("Файл с настройками не найден: " + e.toString());
+            } catch (IOException e) {
+                //Log.e("login activity", "Can not read file: " + e.toString());
+                Toast.makeText(this, "Ошибка чтения файла: " + e.toString(), Toast.LENGTH_LONG).show();
             }
        }
     }
@@ -239,6 +259,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     myOutWriter.write(LS + MyItems.get(i).Name);
                     myOutWriter.write(LS + MyItems.get(i).SmsCount);
                     myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
+                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Mask.size()));
                     for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
                         myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
                     }
