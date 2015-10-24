@@ -56,7 +56,7 @@ public class myItemsAdapter extends BaseAdapter {
         // заполняем View в пункте списка данными из товаров: наименование, цена
         // и картинка
         ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
-        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + "");
+        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
         ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
 
         return view;

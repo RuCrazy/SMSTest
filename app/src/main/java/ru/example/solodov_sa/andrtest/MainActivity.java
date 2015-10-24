@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     private int cur_year, cur_month, cur_day;
 
-    ArrayList<String> msgData;
+    ArrayList<String> msgData = new ArrayList<String>();
 
     ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     myItemsAdapter ItemsAdapter;
@@ -70,6 +70,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         lvItems.setAdapter(ItemsAdapter);
         lvItems.setDivider(getResources().getDrawable(android.R.color.transparent));
 
+        msgData.clear();
         smsadapter = new ArrayAdapter<String>(this, R.layout.sms_list, msgData);
         lvMsg = (ListView) findViewById(R.id.lvMsg);
         lvMsg.setAdapter(smsadapter);
@@ -172,9 +173,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             }
             //lvMsg.setAdapter(cursor);
             MyTV.setText("Найдено " + j + " SMS с ключом: " + TxtMask + "\n" + Sum + " р.");
-           // ArrayList<String> MA = new ArrayList<String>();
-           // MA.add(TxtMask);
-           // MyItems.add(new MyItem(TxtMask, MA, Sum, j));
+            ArrayList<String> MA = new ArrayList<String>();
+            MA.add(TxtMask);
+            MyItems.add(new MyItem(TxtMask, MA, Sum, j));
         }
     }
 
