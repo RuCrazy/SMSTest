@@ -34,9 +34,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class MainActivity extends Activity implements DatePickerFragment.TheListener {
@@ -83,20 +85,29 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         final EditText MyTxt = (EditText) findViewById(R.id.editText);
         MyTxt.setMaxLines(1);
 
+        //Номер отправителя SMS
         Sender = "900";
-        ReqDate = "06.2015";
-        cur_year = 2015;
-        cur_month = 6;
+        //Получаем текущую дату
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("MM.yyyy");
+        ReqDate = df.format(c.getTime());
+        //ReqDate = "06.2015";
+        df = new SimpleDateFormat("yyyy");
+        cur_year = Integer.parseInt(df.format(c.getTime()));
+        df = new SimpleDateFormat("MM");
+        cur_month = Integer.parseInt(df.format(c.getTime()));;
         cur_day = 1;
         Sum = 0;
 
         FilePath = getExternalFilesDir(null).toString()+ "/Settings.txt" ;
 
 
-        MyTV2.setText(ReqDate);
+        df = new SimpleDateFormat("MMM.yyyy");
+        MyTV2.setText(df.format(c.getTime()));
 
         //Получить список СМС
         GetSMS();
+        //Читаем файл настроек
         ReadData();
 
         // MyTV.setText(FilePath);
@@ -106,7 +117,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                FindSMS(MyTxt.getText().toString());
+                AddMyItems(MyTxt.getText().toString());
             }
         };
         myBtn.setOnClickListener(oclBtn1);
@@ -141,7 +152,42 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         myBtn3.setOnClickListener(oclBtn3);
 
     }
-    private void FindSMS(String Text){
+    //Обновление информации MyItems из SMS
+    private void UpdateMyItems(){
+        String str;
+        int k, l, num;
+        for (int i = 0; i < MyItems.size(); i++) {
+            Sum = 0;
+            num = 0;
+            for (int n = 0; n < MyItems.get(i).Mask.size(); n++) {
+                TxtMask = MyItems.get(i).Mask.get(n);
+                TxtMask = TxtMask.toLowerCase();
+                for (int j = 0; j < msgData.size(); j++) {
+                    str = msgData.get(j);
+                    str = str.toLowerCase();
+
+                    if (str.indexOf(TxtMask) > 0) {
+                        num ++;
+                        k = str.indexOf("покупка");
+                        if (k > -1) {
+                            k = k + 8;
+                            l = str.indexOf("р");
+                            Sum = Sum + Float.parseFloat(str.substring(k, l));
+                            //str2 = str.substring(k, l);
+
+                        }
+
+
+                    }
+                }
+                MyItems.get(i).SmsCount = num;
+                MyItems.get(i).Sum = Sum;
+            }
+        }
+        ItemsAdapter.notifyDataSetChanged();
+    }
+    //Добавление элемента MyItems
+    private void AddMyItems(String Text){
         // TODO Auto-generated method stub
         String str, str2;
         int j = 0;
@@ -203,13 +249,13 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         if (num != 0){
                             for (int i = 0; i <= num-1; i++) {
                                 String name = bufferedReader.readLine();
-                                int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
-                                Float sum = Float.parseFloat(bufferedReader.readLine().toString());
+                               // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
+                               // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
                                 ArrayList<String> MA = new ArrayList<String>();
                                 int num2 = Integer.parseInt(bufferedReader.readLine().toString());
                                 for (int j = 0; j <= num2-1; j++) {
                                     MA.add(bufferedReader.readLine().toString());
-                                    FindSMS(MA.get(j));
+                                    AddMyItems(MA.get(j));
                                 }
                                // MyItems.add(new MyItem(name, MA, sum, SmsCount));
                             }
@@ -258,8 +304,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 //Перебираем все элементы MyItems и записываем значения в файл
                 for (int i = 0; i < MyItems.size(); i++){
                     myOutWriter.write(LS + MyItems.get(i).Name);
-                    myOutWriter.write(LS + MyItems.get(i).SmsCount);
-                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
+                   // myOutWriter.write(LS + MyItems.get(i).SmsCount);
+                   // myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
                     myOutWriter.write(LS + String.valueOf(MyItems.get(i).Mask.size()));
                     for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
                         myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
@@ -339,8 +385,16 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         cur_month = month + 1;
         cur_year = year;
         ReqDate = date;
-        MyTV2.setText(ReqDate);
+        SimpleDateFormat df = new SimpleDateFormat("MM.yyyy");
+        Date convertedDate = new Date();
+        try {
+            convertedDate = df.parse(ReqDate);
+        } catch (ParseException e) {
+        }
+        df = new SimpleDateFormat("MMM.yyyy");
+        MyTV2.setText(df.format(convertedDate));
         GetSMS();
+        UpdateMyItems();
     }
 
 
