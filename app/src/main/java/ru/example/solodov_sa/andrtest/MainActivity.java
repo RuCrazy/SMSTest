@@ -9,9 +9,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -72,6 +74,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         lvItems.setAdapter(ItemsAdapter);
         lvItems.setDivider(getResources().getDrawable(android.R.color.transparent));
 
+        registerForContextMenu(lvItems);
+
         msgData.clear();
         smsadapter = new ArrayAdapter<String>(this, R.layout.sms_list, msgData);
         lvMsg = (ListView) findViewById(R.id.lvMsg);
@@ -91,13 +95,13 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("MM.yyyy");
         ReqDate = df.format(c.getTime());
-        //ReqDate = "06.2015";
         df = new SimpleDateFormat("yyyy");
         cur_year = Integer.parseInt(df.format(c.getTime()));
         df = new SimpleDateFormat("MM");
         cur_month = Integer.parseInt(df.format(c.getTime()));;
         cur_day = 1;
         Sum = 0;
+
 
         FilePath = getExternalFilesDir(null).toString()+ "/Settings.txt" ;
 
@@ -111,6 +115,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         ReadData();
 
         // MyTV.setText(FilePath);
+
 
         //Нажатие на кнопку "Отбор"
         View.OnClickListener oclBtn1 = new View.OnClickListener() {
@@ -396,13 +401,26 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         GetSMS();
         UpdateMyItems();
     }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenu.ContextMenuInfo menuInfo){
+        switch (v.getId()) {
+            case R.id.lvItems:
+                getMenuInflater().inflate(R.menu.menu_lvitems, menu);
+        }
 
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
