@@ -54,6 +54,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     ArrayAdapter<String> smsadapter;
     String Sender, ReqDate, TxtMask, FilePath;
 
+    int LastCMVID;
+
     TextView lblMsg, lblNo;
     ListView lvMsg,lvItems;
 
@@ -403,6 +405,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenu.ContextMenuInfo menuInfo){
+        LastCMVID = v.getId();
         switch (v.getId()) {
             case R.id.lvItems:
                 getMenuInflater().inflate(R.menu.menu_lvitems, menu);
@@ -412,8 +415,15 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
-        return true;
+        if (LastCMVID == R.id.lvItems){
+            Toast.makeText(this,item.getItemId(), Toast.LENGTH_LONG).show();
+            if (item.getItemId() == 1) {
+                MyItems.remove(info.position);
+                Toast.makeText(this,info.position, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
