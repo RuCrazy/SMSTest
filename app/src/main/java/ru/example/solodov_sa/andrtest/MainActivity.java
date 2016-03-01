@@ -326,7 +326,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             catch (IOException e)
             {
                 //e.printStackTrace();
-                Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Ошибка записи файла: " + e.toString(), Toast.LENGTH_LONG).show();
             }
 
 
@@ -416,10 +417,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (LastCMVID == R.id.lvItems){
-            Toast.makeText(this,item.getItemId(), Toast.LENGTH_LONG).show();
-            if (item.getItemId() == 1) {
+            if (item.getItemId() == R.id.delitem) { //Удаляем выбранную позицию
+                //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
                 MyItems.remove(info.position);
-                Toast.makeText(this,info.position, Toast.LENGTH_LONG).show();
+                ItemsAdapter.notifyDataSetChanged();
                 return true;
             }
         }
