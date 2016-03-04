@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/custom_border">
+    android:background="@drawable/custom_border"
+    android:clickable="false">
 
     <TextView
         android:id="@+id/tvName"
@@ -22,7 +23,7 @@
         <TextView
             android:id="@+id/tvSum"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="22dp"
             android:layout_gravity="right"
             android:layout_marginLeft="20dp"
             android:layout_weight = "3"
@@ -38,17 +39,16 @@
 
         <TextView
             android:id="@+id/tvSmsCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="22dp"
             android:layout_gravity="right"
             android:text="SmsCount"
             android:layout_alignTop="@+id/tvSum"
             android:layout_alignParentRight="true"
             android:textSize="17dp"
-            android:layout_weight = "1"
-            android:layout_marginRight="20dp"
             android:paddingLeft="3dp"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="20dp">
         </TextView>
 
     </LinearLayout>
