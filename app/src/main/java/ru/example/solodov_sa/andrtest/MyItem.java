@@ -9,15 +9,11 @@ import java.util.ArrayList;
 public class MyItem {
 
     String Name;
-    ArrayList<String> Mask;
-    float Sum;
-    int SmsCount;
+    MyElem MyElement;
 
-    MyItem(String _name, ArrayList<String> _mask, float _sum, int _count) {
+    MyItem(String _name, MyElem _MyElement) {
         Name = _name;
-        Mask = _mask;
-        Sum = _sum;
-        SmsCount = _count;
+        MyElement = _MyElement;
     }
 
 }

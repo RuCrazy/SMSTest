@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -13,6 +15,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -63,7 +66,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     ArrayList<String> msgData = new ArrayList<String>();
 
-    ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
+    static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     myItemsAdapter ItemsAdapter;
 
     @Override
@@ -166,8 +169,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         for (int i = 0; i < MyItems.size(); i++) {
             Sum = 0;
             num = 0;
-            for (int n = 0; n < MyItems.get(i).Mask.size(); n++) {
-                TxtMask = MyItems.get(i).Mask.get(n);
+            for (int n = 0; n < MyItems.get(i).MyElement.Mask.size(); n++) {
+                TxtMask = MyItems.get(i).MyElement.Mask.get(n);
                 TxtMask = TxtMask.toLowerCase();
                 for (int j = 0; j < msgData.size(); j++) {
                     str = msgData.get(j);
@@ -181,14 +184,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                             l = str.indexOf("р");
                             Sum = Sum + Float.parseFloat(str.substring(k, l));
                             //str2 = str.substring(k, l);
-
                         }
-
-
                     }
                 }
-                MyItems.get(i).SmsCount = num;
-                MyItems.get(i).Sum = Sum;
+                MyItems.get(i).MyElement.SmsCount.set(n, num);
+                MyItems.get(i).MyElement.Sum.set(n, Sum);
             }
         }
         ItemsAdapter.notifyDataSetChanged();
@@ -226,9 +226,14 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             }
             //lvMsg.setAdapter(cursor);
             MyTV.setText("Найдено " + j + " SMS с ключом: " + TxtMask + "\n" + Sum + " р.");
-            ArrayList<String> MA = new ArrayList<String>();
-            MA.add(TxtMask);
-            MyItems.add(new MyItem(TxtMask, MA, Sum, j));
+            ArrayList<String> _mask = new ArrayList<String>();
+            _mask.add(TxtMask);
+            ArrayList<Float> _sum = new ArrayList<Float>();
+            _sum.add(Sum);
+            ArrayList<Integer> _count = new ArrayList<Integer>();
+            _count.add(j);
+            MyElem MA = new MyElem(_mask, _sum, _count);
+            MyItems.add(new MyItem(TxtMask, MA));
         }
     }
 
@@ -313,9 +318,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     myOutWriter.write(LS + MyItems.get(i).Name);
                    // myOutWriter.write(LS + MyItems.get(i).SmsCount);
                    // myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
-                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).Mask.size()));
-                    for (int j = 0; j < MyItems.get(i).Mask.size(); j++){
-                        myOutWriter.write(LS + MyItems.get(i).Mask.get(j));
+                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).MyElement.Mask.size()));
+                    for (int j = 0; j < MyItems.get(i).MyElement.Mask.size(); j++){
+                        myOutWriter.write(LS + MyItems.get(i).MyElement.Mask.get(j));
                     }
                 }
                 myOutWriter.close();
@@ -421,6 +426,12 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
                 MyItems.remove(info.position);
                 ItemsAdapter.notifyDataSetChanged();
+                return true;
+            }
+            if (item.getItemId() == R.id.item) {
+                Intent intent = new Intent(MainActivity.this, MyItemActivity.class);
+                intent.putExtra("Position", info.position);
+                startActivity(intent);
                 return true;
             }
         }

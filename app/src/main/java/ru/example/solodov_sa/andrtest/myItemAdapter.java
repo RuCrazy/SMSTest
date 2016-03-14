@@ -12,12 +12,12 @@ import java.util.ArrayList;
 /**
  * Created by solodov_sa on 04.08.2015.
  */
-public class myItemsAdapter extends BaseAdapter {
+public class myItemAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
     ArrayList<MyItem> objects;
 
-    myItemsAdapter (Context context, ArrayList<MyItem> items) {
+    myItemAdapter(Context context, ArrayList<MyItem> items) {
         ctx = context;
         objects = items;
         lInflater = (LayoutInflater) ctx
@@ -54,15 +54,10 @@ public class myItemsAdapter extends BaseAdapter {
         MyItem p = getProduct(position);
 
         // заполняем View
-        float _sum = 0;
-        int _count = 0;
         ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
-        for (int i = 0; i< p.MyElement.Sum.size(); i++ ) {
-            _sum = _sum + p.MyElement.Sum.get(i);
-            _count = _count + p.MyElement.SmsCount.get(i);
-        }
-        ((TextView) view.findViewById(R.id.tvSum)).setText(_sum + " р.");
-        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(_count + "");
+        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Name + " р.");
+        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.Name + "");
+
         return view;
     }
 
