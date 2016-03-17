@@ -7,11 +7,11 @@ import java.util.ArrayList;
  */
 public class MyElem {
 
-    ArrayList<String> Mask;
-    ArrayList<Float> Sum;
-    ArrayList<Integer> SmsCount;
+    String Mask;
+    Float Sum;
+    Integer SmsCount;
 
-    MyElem( ArrayList<String> _mask, ArrayList<Float> _sum, ArrayList<Integer> _count) {
+    MyElem(String _mask, Float _sum, Integer _count) {
         Mask = _mask;
         Sum = _sum;
         SmsCount = _count;

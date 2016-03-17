@@ -169,8 +169,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         for (int i = 0; i < MyItems.size(); i++) {
             Sum = 0;
             num = 0;
-            for (int n = 0; n < MyItems.get(i).MyElement.Mask.size(); n++) {
-                TxtMask = MyItems.get(i).MyElement.Mask.get(n);
+            for (int n = 0; n < MyItems.get(i).MyElement.size(); n++) {
+                TxtMask = MyItems.get(i).MyElement.get(n).Mask;
                 TxtMask = TxtMask.toLowerCase();
                 for (int j = 0; j < msgData.size(); j++) {
                     str = msgData.get(j);
@@ -187,8 +187,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         }
                     }
                 }
-                MyItems.get(i).MyElement.SmsCount.set(n, num);
-                MyItems.get(i).MyElement.Sum.set(n, Sum);
+                MyItems.get(i).MyElement.get(n).SmsCount = num;
+                MyItems.get(i).MyElement.get(n).Sum = Sum;
             }
         }
         ItemsAdapter.notifyDataSetChanged();
@@ -226,14 +226,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             }
             //lvMsg.setAdapter(cursor);
             MyTV.setText("Найдено " + j + " SMS с ключом: " + TxtMask + "\n" + Sum + " р.");
-            ArrayList<String> _mask = new ArrayList<String>();
-            _mask.add(TxtMask);
-            ArrayList<Float> _sum = new ArrayList<Float>();
-            _sum.add(Sum);
-            ArrayList<Integer> _count = new ArrayList<Integer>();
-            _count.add(j);
-            MyElem MA = new MyElem(_mask, _sum, _count);
-            MyItems.add(new MyItem(TxtMask, MA));
+            MyElem _Elem = new MyElem(TxtMask, Sum, j);
+            ArrayList<MyElem> _MyElem = new ArrayList<MyElem>();
+            _MyElem.add(_Elem);
+            MyItem _MyItem = new MyItem(TxtMask, _MyElem);
+            MyItems.add(_MyItem);
         }
     }
 
@@ -318,9 +315,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     myOutWriter.write(LS + MyItems.get(i).Name);
                    // myOutWriter.write(LS + MyItems.get(i).SmsCount);
                    // myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
-                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).MyElement.Mask.size()));
-                    for (int j = 0; j < MyItems.get(i).MyElement.Mask.size(); j++){
-                        myOutWriter.write(LS + MyItems.get(i).MyElement.Mask.get(j));
+                    myOutWriter.write(LS + String.valueOf(MyItems.get(i).MyElement.size()));
+                    for (int j = 0; j < MyItems.get(i).MyElement.size(); j++){
+                        myOutWriter.write(LS + MyItems.get(i).MyElement.get(j).Mask);
                     }
                 }
                 myOutWriter.close();

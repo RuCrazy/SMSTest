@@ -57,9 +57,9 @@ public class myItemsAdapter extends BaseAdapter {
         float _sum = 0;
         int _count = 0;
         ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
-        for (int i = 0; i< p.MyElement.Sum.size(); i++ ) {
-            _sum = _sum + p.MyElement.Sum.get(i);
-            _count = _count + p.MyElement.SmsCount.get(i);
+        for (int i = 0; i< p.MyElement.size(); i++ ) {
+            _sum = _sum + p.MyElement.get(i).Sum;
+            _count = _count + p.MyElement.get(i).SmsCount;
         }
         ((TextView) view.findViewById(R.id.tvSum)).setText(_sum + " р.");
         ((TextView) view.findViewById(R.id.tvSmsCount)).setText(_count + "");

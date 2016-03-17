@@ -9,9 +9,9 @@ import java.util.ArrayList;
 public class MyItem {
 
     String Name;
-    MyElem MyElement;
+    ArrayList<MyElem> MyElement;
 
-    MyItem(String _name, MyElem _MyElement) {
+    MyItem(String _name, ArrayList<MyElem> _MyElement) {
         Name = _name;
         MyElement = _MyElement;
     }
