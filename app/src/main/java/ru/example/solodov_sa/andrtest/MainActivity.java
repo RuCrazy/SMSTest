@@ -69,10 +69,14 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     myItemsAdapter ItemsAdapter;
 
+    DialogFragment ItemsNameDialog;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ItemsNameDialog = new MyItemsNameDialog();
 
         ItemsAdapter = new myItemsAdapter(this, MyItems);
         lvItems = (ListView) findViewById(R.id.lvItems);
@@ -419,17 +423,21 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (LastCMVID == R.id.lvItems){
-            if (item.getItemId() == R.id.delitem) { //Удаляем выбранную позицию
-                //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
-                MyItems.remove(info.position);
-                ItemsAdapter.notifyDataSetChanged();
-                return true;
-            }
-            if (item.getItemId() == R.id.item) {
-                Intent intent = new Intent(MainActivity.this, MyItemActivity.class);
-                intent.putExtra("Position", info.position);
-                startActivity(intent);
-                return true;
+            switch (item.getItemId()){
+                case  R.id.delitem:
+                    //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
+                    MyItems.remove(info.position);
+                    ItemsAdapter.notifyDataSetChanged();
+                    return true;
+                case R.id.item:
+                    Intent intent = new Intent(MainActivity.this, MyItemActivity.class);
+                    intent.putExtra("Position", info.position);
+                    startActivity(intent);
+                    return true;
+                case  R.id.rename:
+                    ItemsNameDialog.show(getFragmentManager(), "Rename");
+
+                    return true;
             }
         }
         return super.onContextItemSelected(item);

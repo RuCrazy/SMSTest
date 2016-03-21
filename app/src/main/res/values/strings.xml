@@ -7,5 +7,8 @@
     <string name="delitem">Удалить группу</string>
     <string name="item">Просмотр группы</string>
     <string name="menu_back">Назад</string>
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="rename">Переименовать</string>
     <string name="title_activity_my_item">MyItemActivity</string>
 </resources>
