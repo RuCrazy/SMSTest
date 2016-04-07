@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 
 public class MyItemsNameDialog extends DialogFragment implements OnClickListener {
 
-    final String LOG_TAG = "myLogs";
+    EditText MyTextEditTxt;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -26,11 +28,23 @@ public class MyItemsNameDialog extends DialogFragment implements OnClickListener
         View v = inflater.inflate(R.layout.itemsnamedialog, null);
         v.findViewById(R.id.ok).setOnClickListener(this);
         v.findViewById(R.id.cancel).setOnClickListener(this);
+         MyTextEditTxt = (EditText) v.findViewById(R.id.editText2);
         return v;
     }
 
     public void onClick(View v) {
-        Toast.makeText(getActivity(), "Dialog 1: " + ((Button) v).getText(),Toast.LENGTH_LONG).show();
+
+        int id = ((Button) v).getId();
+        switch (id) {
+            case R.id.ok:
+
+
+                Toast.makeText(getActivity(), MyTextEditTxt.getText() + " Ок", Toast.LENGTH_LONG).show();
+                dismiss();
+                break;
+            case R.id.cancel:
+                Toast.makeText(getActivity(), "" + " Отмена", Toast.LENGTH_LONG).show();
+        }
         dismiss();
     }
 

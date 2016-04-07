@@ -416,6 +416,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         switch (v.getId()) {
             case R.id.lvItems:
                 getMenuInflater().inflate(R.menu.menu_lvitems, menu);
+            break;
         }
 
     }
