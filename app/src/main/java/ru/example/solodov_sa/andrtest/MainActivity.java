@@ -67,9 +67,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     ArrayList<String> msgData = new ArrayList<String>();
 
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
-    myItemsAdapter ItemsAdapter;
+    static myItemsAdapter ItemsAdapter;
 
     DialogFragment ItemsNameDialog;
+
+    static int ItemPosition;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -197,12 +199,25 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         }
         ItemsAdapter.notifyDataSetChanged();
     }
+    //Добавление элемента MyItem
+    private void AddMyItem(String Name){
+        ArrayList<MyElem> _MyElem = new ArrayList<MyElem>();
+
+        MyItem _MyItem = new MyItem(Name, _MyElem);
+        MyItems.add(_MyItem);
+    }
+    //Добавление элемента MyElem
+    private void AddMyElem(String Mask, int i){
+        float j = 0;
+        MyElem _Elem = new MyElem(Mask, j, 0);
+        MyItems.get(i).MyElement.add(_Elem);
+
+    }
     //Добавление элемента MyItems
     private void AddMyItems(String Text){
         // TODO Auto-generated method stub
-        String str, str2;
+        String str;
         int j = 0;
-        str2 = "";
         int k;
         int l;
         Sum = 0;
@@ -221,11 +236,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         k = k + 8;
                         l = str.indexOf("р");
                         Sum = Sum + Float.parseFloat(str.substring(k, l));
-                        str2 = str.substring(k, l);
-
                     }
-
-
                 }
             }
             //lvMsg.setAdapter(cursor);
@@ -262,13 +273,15 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         if (num != 0){
                             for (int i = 0; i <= num-1; i++) {
                                 String name = bufferedReader.readLine();
+                                AddMyItem(name);
                                // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
                                // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
-                                ArrayList<String> MA = new ArrayList<String>();
+                                //ArrayList<String> MA = new ArrayList<String>();
                                 int num2 = Integer.parseInt(bufferedReader.readLine().toString());
                                 for (int j = 0; j <= num2-1; j++) {
-                                    MA.add(bufferedReader.readLine().toString());
-                                    AddMyItems(MA.get(j));
+                                    String Mask = bufferedReader.readLine().toString();
+                                    //AddMyItems(MA.get(j));
+                                    AddMyElem(Mask, i);
                                 }
                                // MyItems.add(new MyItem(name, MA, sum, SmsCount));
                             }
@@ -436,8 +449,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     startActivity(intent);
                     return true;
                 case  R.id.rename:
+                    ItemPosition = info.position;
                     ItemsNameDialog.show(getFragmentManager(), "Rename");
-
+                    ItemsAdapter.notifyDataSetChanged();
                     return true;
             }
         }
