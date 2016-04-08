@@ -28,7 +28,7 @@ public class MyItemsNameDialog extends DialogFragment implements OnClickListener
         View v = inflater.inflate(R.layout.itemsnamedialog, null);
         v.findViewById(R.id.ok).setOnClickListener(this);
         v.findViewById(R.id.cancel).setOnClickListener(this);
-         MyTextEditTxt = (EditText) v.findViewById(R.id.editText2);
+        MyTextEditTxt = (EditText) v.findViewById(R.id.editText2);
         return v;
     }
 
@@ -37,13 +37,11 @@ public class MyItemsNameDialog extends DialogFragment implements OnClickListener
         int id = ((Button) v).getId();
         switch (id) {
             case R.id.ok:
-
-
-                Toast.makeText(getActivity(), MyTextEditTxt.getText() + " Ок", Toast.LENGTH_LONG).show();
-                dismiss();
+                MainActivity.MyItems.get(MainActivity.ItemPosition).Name = MyTextEditTxt.getText().toString();
+                MainActivity.ItemsAdapter.notifyDataSetChanged();
                 break;
             case R.id.cancel:
-                Toast.makeText(getActivity(), "" + " Отмена", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), MyTextEditTxt.getText() + " Отмена", Toast.LENGTH_LONG).show();
         }
         dismiss();
     }
