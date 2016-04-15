@@ -7,7 +7,6 @@ package ru.example.solodov_sa.andrtest;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,18 +16,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class MyItemsNameDialog extends DialogFragment implements OnClickListener {
+public class MyElemMaskDialog extends DialogFragment implements OnClickListener {
 
     EditText MyTextEditTxt;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().setTitle("Введите наименование");
-        View v = inflater.inflate(R.layout.itemsnamedialog, null);
-        v.findViewById(R.id.ok).setOnClickListener(this);
-        v.findViewById(R.id.cancel).setOnClickListener(this);
-        MyTextEditTxt = (EditText) v.findViewById(R.id.editText2);
+        getDialog().setTitle("Введите искомый текст");
+        View v = inflater.inflate(R.layout.elemmaskdialog, null);
+        v.findViewById(R.id.emOk).setOnClickListener(this);
+        v.findViewById(R.id.emCancel).setOnClickListener(this);
+        MyTextEditTxt = (EditText) v.findViewById(R.id.etMask);
         return v;
     }
 
@@ -36,12 +35,13 @@ public class MyItemsNameDialog extends DialogFragment implements OnClickListener
 
         int id = ((Button) v).getId();
         switch (id) {
-            case R.id.ok:
-                MainActivity.MyItems.get(MainActivity.ItemPosition).Name = MyTextEditTxt.getText().toString();
-                MainActivity.ItemsAdapter.notifyDataSetChanged();
+            case R.id.emOk:
+                MainActivity.AddMyElem(MyTextEditTxt.getText().toString(), MainActivity.ItemPosition);
                 MyTextEditTxt.setText("");
+                MainActivity.UpdateMyItems();
+                MyItemActivity.ItemAdapter.notifyDataSetChanged();
                 break;
-            case R.id.cancel:
+            case R.id.emCancel:
                 //Toast.makeText(getActivity(), MyTextEditTxt.getText() + " Отмена", Toast.LENGTH_LONG).show();
         }
         dismiss();

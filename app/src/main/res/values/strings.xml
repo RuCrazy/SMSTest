@@ -11,4 +11,5 @@
     <string name="ok">ОК</string>
     <string name="rename">Переименовать</string>
     <string name="title_activity_my_item">MyItemActivity</string>
+    <string name="delelem">Удвлить элемент</string>
 </resources>

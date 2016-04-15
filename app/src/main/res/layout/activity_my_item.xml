@@ -17,13 +17,25 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="28dp" />
+        android:textSize="28dp"
+        android:layout_alignBottom="@+id/BAddItem"
+        android:layout_toLeftOf="@+id/BAddItem"
+        android:layout_toStartOf="@+id/BAddItem" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/LvItem"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/BAddItem"
+        android:layout_alignRight="@+id/BAddItem"
+        android:layout_alignEnd="@+id/BAddItem" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавить"
+        android:id="@+id/BAddItem"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>

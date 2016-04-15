@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public class myItemAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
-    ArrayList<MyItem> objects;
+    ArrayList<MyElem> objects;
 
-    myItemAdapter(Context context, ArrayList<MyItem> items) {
+    myItemAdapter(Context context, ArrayList<MyElem> items) {
         ctx = context;
         objects = items;
         lInflater = (LayoutInflater) ctx
@@ -51,19 +51,19 @@ public class myItemAdapter extends BaseAdapter {
             view = lInflater.inflate(R.layout.myitems, parent, false);
         }
 
-        MyItem p = getProduct(position);
+        MyElem p = getProduct(position);
 
         // заполняем View
-        ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
-        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Name + " р.");
-        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.Name + "");
+        ((TextView) view.findViewById(R.id.tvName)).setText(p.Mask);
+        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
+        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
 
         return view;
     }
 
     // товар по позиции
-    MyItem getProduct(int position) {
-        return ((MyItem) getItem(position));
+    MyElem getProduct(int position) {
+        return ((MyElem) getItem(position));
     }
 
 }

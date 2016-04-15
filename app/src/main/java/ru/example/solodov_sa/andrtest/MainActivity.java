@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     private int cur_year, cur_month, cur_day;
 
-    ArrayList<String> msgData = new ArrayList<String>();
+    static ArrayList<String> msgData = new ArrayList<String>();
 
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     static myItemsAdapter ItemsAdapter;
@@ -84,6 +84,16 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(ItemsAdapter);
         lvItems.setDivider(getResources().getDrawable(android.R.color.transparent));
+
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(MainActivity.this, MyItemActivity.class);
+                ItemPosition = position;
+                startActivity(intent);
+            }
+        });
+
 
         registerForContextMenu(lvItems);
 
@@ -124,7 +134,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         GetSMS();
         //Читаем файл настроек
         ReadData();
-
+        UpdateMyItems();
         // MyTV.setText(FilePath);
 
 
@@ -169,9 +179,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     }
     //Обновление информации MyItems из SMS
-    private void UpdateMyItems(){
-        String str;
+    public static void UpdateMyItems(){
+        String str, TxtMask;
         int k, l, num;
+        float Sum;
         for (int i = 0; i < MyItems.size(); i++) {
             Sum = 0;
             num = 0;
@@ -195,6 +206,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 }
                 MyItems.get(i).MyElement.get(n).SmsCount = num;
                 MyItems.get(i).MyElement.get(n).Sum = Sum;
+                num = 0;
+                Sum = 0;
             }
         }
         ItemsAdapter.notifyDataSetChanged();
@@ -207,7 +220,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         MyItems.add(_MyItem);
     }
     //Добавление элемента MyElem
-    private void AddMyElem(String Mask, int i){
+    public static void AddMyElem(String Mask, int i){
         float j = 0;
         MyElem _Elem = new MyElem(Mask, j, 0);
         MyItems.get(i).MyElement.add(_Elem);
@@ -340,7 +353,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 myOutWriter.close();
                 fOut.close();
 
-                Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
             }
             catch (IOException e)
             {
@@ -444,20 +457,19 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     ItemsAdapter.notifyDataSetChanged();
                     return true;
                 case R.id.item:
+                    ItemPosition = info.position;
                     Intent intent = new Intent(MainActivity.this, MyItemActivity.class);
-                    intent.putExtra("Position", info.position);
                     startActivity(intent);
                     return true;
                 case  R.id.rename:
                     ItemPosition = info.position;
-                    ItemsNameDialog.show(getFragmentManager(), "Rename");
+                    ItemsNameDialog.show(getFragmentManager(), "");
                     ItemsAdapter.notifyDataSetChanged();
                     return true;
             }
         }
         return super.onContextItemSelected(item);
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
