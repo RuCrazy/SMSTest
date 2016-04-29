@@ -51,7 +51,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     Button myBtn;
     TextView MyTV, MyTV2;
     Button myBtn2, myBtn3;
-    EditText MyTxt;
     float Sum;
 
     ArrayAdapter<String> smsadapter;
@@ -72,6 +71,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     DialogFragment ItemsNameDialog;
 
     static int ItemPosition;
+    static  boolean NewItem;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -107,8 +107,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         Button myBtn = (Button) findViewById(R.id.button);
         Button myBtn2 = (Button) findViewById(R.id.button2);
         Button myBtn3 = (Button) findViewById(R.id.button3);
-        final EditText MyTxt = (EditText) findViewById(R.id.editText);
-        MyTxt.setMaxLines(1);
 
         //Номер отправителя SMS
         Sender = "900";
@@ -143,7 +141,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                AddMyItems(MyTxt.getText().toString());
+                //AddMyItems(MyTxt.getText().toString());
+                NewItem = true;
+                AddMyItem("NewGroup");
+                ItemPosition = MyItems.size() - 1;
+                ItemsNameDialog.show(getFragmentManager(), "");
             }
         };
         myBtn.setOnClickListener(oclBtn1);
@@ -178,6 +180,18 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         myBtn3.setOnClickListener(oclBtn3);
 
     }
+    //Поиск всех объектов element из SMS
+    public static void GetElements(){
+        String str;
+        for (int i = 0; i < msgData.size(); i++) {
+            str = msgData.get(i);
+            str.toLowerCase();
+            if (str.indexOf("покупка") > 0) {
+                str.substring(str.indexOf("покупка") + 8);
+            }
+        }
+    }
+
     //Обновление информации MyItems из SMS
     public static void UpdateMyItems(){
         String str, TxtMask;
@@ -464,7 +478,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 case  R.id.rename:
                     ItemPosition = info.position;
                     ItemsNameDialog.show(getFragmentManager(), "");
-                    ItemsAdapter.notifyDataSetChanged();
                     return true;
             }
         }
@@ -483,7 +496,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings:
