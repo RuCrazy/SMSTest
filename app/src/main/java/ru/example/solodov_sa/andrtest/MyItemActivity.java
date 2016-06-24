@@ -20,7 +20,7 @@ public class MyItemActivity extends Activity {
     ListView lvItem;
     static myItemAdapter ItemAdapter;
     //ArrayList<MyElem> MyElements = new ArrayList<MyElem>();
-    DialogFragment ElemMaskDialog;
+    DialogFragment ElemMaskDialog, ElemMoveDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,7 @@ public class MyItemActivity extends Activity {
         setContentView(R.layout.activity_my_item);
 
         ElemMaskDialog = new MyElemMaskDialog();
+        ElemMoveDialog = new MyElemMoveDialog();
 
         TVName = (TextView) findViewById(R.id.textView3);
         TVName.setText(MainActivity.MyItems.get(MainActivity.ItemPosition).Name);
@@ -35,6 +36,7 @@ public class MyItemActivity extends Activity {
         ItemAdapter = new myItemAdapter(this, MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement);
         lvItem = (ListView) findViewById(R.id.LvItem);
         lvItem.setAdapter(ItemAdapter);
+        lvItem.setDivider(getResources().getDrawable(android.R.color.transparent));
 
         Button BAdd = (Button) findViewById(R.id.BAddItem);
 
@@ -68,6 +70,10 @@ public class MyItemActivity extends Activity {
                     MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement.remove(info.position);
                     MainActivity.ItemsAdapter.notifyDataSetChanged();
                     ItemAdapter.notifyDataSetChanged();
+                    return true;
+                case R.id.moveelem:
+                    ElemMoveDialog.show(getFragmentManager(), "");
+                    MainActivity.ElemPosition = info.position;
                     return true;
             }
         return super.onContextItemSelected(item);

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    android:id="@+id/GroupNameTV"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:textStyle="bold"
+    android:textSize="24dp"
+    android:text="Name"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:singleLine="false">
+</TextView>

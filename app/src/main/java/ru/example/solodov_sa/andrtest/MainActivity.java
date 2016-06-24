@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     DialogFragment ItemsNameDialog;
 
-    static int ItemPosition;
+    static int ItemPosition, ElemPosition;
     static  boolean NewItem;
 
     @Override
@@ -132,19 +132,20 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         GetSMS();
         //Читаем файл настроек
         ReadData();
+        ItemOther();
+        GetElements();
         UpdateMyItems();
         // MyTV.setText(FilePath);
 
 
-        //Нажатие на кнопку "Отбор"
+        //Нажатие на кнопку "Добавить"
         View.OnClickListener oclBtn1 = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                //AddMyItems(MyTxt.getText().toString());
                 NewItem = true;
-                AddMyItem("NewGroup");
-                ItemPosition = MyItems.size() - 1;
+                AddMyItem(MyItems.size()-1,"NewGroup");
+
                 ItemsNameDialog.show(getFragmentManager(), "");
             }
         };
@@ -180,14 +181,45 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         myBtn3.setOnClickListener(oclBtn3);
 
     }
+    //Проверка на наличие и создание группы "Прочее"
+    public void ItemOther(){
+        boolean f;
+        f = false;
+        for (int i = 0; i < MyItems.size(); i++){
+            if (MyItems.get(i).Name.equals("Прочее")) {
+                f = true;
+            }
+        }
+        if (!f) {
+            AddMyItem(MyItems.size(),"Прочее");
+        }
+
+    }
+
     //Поиск всех объектов element из SMS
-    public static void GetElements(){
+    public void GetElements(){
         String str;
+        boolean f;
         for (int i = 0; i < msgData.size(); i++) {
             str = msgData.get(i);
             str.toLowerCase();
             if (str.indexOf("покупка") > 0) {
-                str.substring(str.indexOf("покупка") + 8);
+                str = str.substring(str.indexOf("покупка") + 8);
+                str = str.substring(str.indexOf("р")+2);
+                str = str.substring(0,str.indexOf("Баланс")-1);
+                MyTV.setText(str);
+                f = false;
+                for (int n = 0; n < MyItems.size(); n++) {
+                    for (int j = 0; j < MyItems.get(n).MyElement.size(); j++) {
+                        if (str.equals(MyItems.get(n).MyElement.get(j).Mask)) {
+                            f = true;
+                            MyTV.setText(str + " " + MyItems.size());
+                        }
+                    }
+                }
+                if (!f) {
+                    AddMyElem(str, MyItems.size()-1);
+                }
             }
         }
     }
@@ -227,18 +259,23 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         ItemsAdapter.notifyDataSetChanged();
     }
     //Добавление элемента MyItem
-    private void AddMyItem(String Name){
-        ArrayList<MyElem> _MyElem = new ArrayList<MyElem>();
+    private void AddMyItem(int Pos, String Name){
 
+        ArrayList<MyElem> _MyElem = new ArrayList<MyElem>();
+        _MyElem.clear();
         MyItem _MyItem = new MyItem(Name, _MyElem);
-        MyItems.add(_MyItem);
+        MyItems.add(Pos, _MyItem);
     }
     //Добавление элемента MyElem
     public static void AddMyElem(String Mask, int i){
         float j = 0;
         MyElem _Elem = new MyElem(Mask, j, 0);
         MyItems.get(i).MyElement.add(_Elem);
-
+    }
+    //Перемещение элемента MyElem
+    public static void MoveMyElem(int _Elem, int _OldItem, int _NewItem){
+        MyItems.get(_NewItem).MyElement.add(MyItems.get(_OldItem).MyElement.get(_Elem));
+        MyItems.get(_OldItem).MyElement.remove(_Elem);
     }
     //Добавление элемента MyItems
     private void AddMyItems(String Text){
@@ -300,7 +337,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         if (num != 0){
                             for (int i = 0; i <= num-1; i++) {
                                 String name = bufferedReader.readLine();
-                                AddMyItem(name);
+                                AddMyItem(MyItems.size(),name);
                                // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
                                // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
                                 //ArrayList<String> MA = new ArrayList<String>();
@@ -467,8 +504,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             switch (item.getItemId()){
                 case  R.id.delitem:
                     //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
-                    MyItems.remove(info.position);
-                    ItemsAdapter.notifyDataSetChanged();
+                    if (!MyItems.get(info.position).Name.equals("Прочее")) {
+                        MyItems.remove(info.position);
+                        ItemsAdapter.notifyDataSetChanged();
+                    }
                     return true;
                 case R.id.item:
                     ItemPosition = info.position;
@@ -476,8 +515,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     startActivity(intent);
                     return true;
                 case  R.id.rename:
-                    ItemPosition = info.position;
-                    ItemsNameDialog.show(getFragmentManager(), "");
+                    if (!MyItems.get(info.position).Name.equals("Прочее")) {
+                        ItemPosition = info.position;
+                        ItemsNameDialog.show(getFragmentManager(), "");
+                    }
                     return true;
             }
         }
