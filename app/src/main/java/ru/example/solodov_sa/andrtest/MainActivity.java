@@ -50,7 +50,7 @@ import java.util.Date;
 public class MainActivity extends Activity implements DatePickerFragment.TheListener {
 
     Button myBtn;
-    TextView MyTV, MyTV2;
+    TextView MyTV, MyTV2, MyTV3, TVBalance1, TVBalance2, TVBalance3;
     Button myBtn2, myBtn3;
     float Sum, Total;
 
@@ -104,7 +104,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         lvMsg = (ListView) findViewById(R.id.lvMsg);
         lvMsg.setAdapter(smsadapter);
 
-        MyTV = (TextView) findViewById(R.id.textView);
+        TVBalance1 = (TextView) findViewById(R.id.textView);
+        TVBalance2 = (TextView) findViewById(R.id.textView5);
+        TVBalance3 = (TextView) findViewById(R.id.textView6);
         MyTV2 = (TextView) findViewById(R.id.textView2);
         Button myBtn = (Button) findViewById(R.id.button);
         Button myBtn2 = (Button) findViewById(R.id.button2);
@@ -562,7 +564,12 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         BigDecimal d3 = new BigDecimal(String.valueOf(Total));
         d3 = d3.setScale(2, BigDecimal.ROUND_HALF_EVEN);
         Total = d3.floatValue();
-        MyTV.setText(P + "\r\n" + R + "\r\n" + Total);
+        //MyTV.setText(P + "\r\n" + R + "\r\n" + Total);
+        TVBalance1.setText(P + "");
+        TVBalance2.setText(R + "");
+        TVBalance3.setText(Total + "");
+        //MyTV3.setText("Приход: " + "\r\n" + "Расход: " + "\r\n" + "Итого: ");
+
     }
 
     @Override

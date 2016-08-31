@@ -13,4 +13,9 @@
     <string name="title_activity_my_item">MyItemActivity</string>
     <string name="delelem">Удалить элемент</string>
     <string name="moveelem">Переместить элемент</string>
+    <string name="date">Дата</string>
+    <string name="add">Добавить</string>
+    <string name="prihod">Приход:</string>
+    <string name="rashod">Расход:</string>
+    <string name="itog">Итого:</string>
 </resources>
