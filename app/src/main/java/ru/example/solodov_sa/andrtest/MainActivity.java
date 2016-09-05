@@ -67,17 +67,21 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     static ArrayList<String> msgData = new ArrayList<String>();
 
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
+    static ArrayList<MyItem> MyItemsHideNull = new ArrayList<MyItem>();
     static myItemsAdapter ItemsAdapter;
 
     DialogFragment ItemsNameDialog;
 
     static int ItemPosition, ElemPosition;
-    static  boolean NewItem;
+    static  boolean NewItem, SettingsHideNullItem;
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SettingsHideNullItem = true;
 
         ItemsNameDialog = new MyItemsNameDialog();
 
@@ -477,6 +481,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
 
                 String LS = "\r\n";
+                if (SettingsHideNullItem){
+                    myOutWriter.write("1");
+                }else {myOutWriter.write("0");}
                 myOutWriter.write(String.valueOf(MyItems.size()));
                 //Перебираем все элементы MyItems и записываем значения в файл
                 for (int i = 0; i < MyItems.size(); i++){
@@ -566,7 +573,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         Total = d3.floatValue();
         //MyTV.setText(P + "\r\n" + R + "\r\n" + Total);
         TVBalance1.setText(P + "");
-        TVBalance2.setText(R + "");
+        TVBalance2.setText("-" + R);
         TVBalance3.setText(Total + "");
         //MyTV3.setText("Приход: " + "\r\n" + "Расход: " + "\r\n" + "Итого: ");
 
@@ -653,6 +660,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.file_save:
                 SaveData();

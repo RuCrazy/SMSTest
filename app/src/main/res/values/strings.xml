@@ -18,4 +18,5 @@
     <string name="prihod">Приход:</string>
     <string name="rashod">Расход:</string>
     <string name="itog">Итого:</string>
+    <string name="NullItems">Скрыть элементы с нулевым значением</string>
 </resources>

@@ -47,16 +47,20 @@ public class myItemAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // используем созданные, но не используемые view
         View view = convertView;
-        if (view == null) {
+        //if (view == null) {
             view = lInflater.inflate(R.layout.myitems, parent, false);
-        }
-
+        //}
         MyElem p = getProduct(position);
 
-        // заполняем View
-        ((TextView) view.findViewById(R.id.tvName)).setText(p.Mask);
-        ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
-        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
+        if ((p.SmsCount == 0) & (MainActivity.SettingsHideNullItem)){
+            view = lInflater.inflate(R.layout.null_item,parent, false);
+           // view.setVisibility(View.GONE);
+        }else{
+            // заполняем View
+            ((TextView) view.findViewById(R.id.tvName)).setText(p.Mask);
+            ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
+            ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
+        }
 
         return view;
     }
