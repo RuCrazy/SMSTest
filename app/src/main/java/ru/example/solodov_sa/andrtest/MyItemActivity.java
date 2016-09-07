@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.AlertDialog;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -28,19 +29,22 @@ public class MyItemActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_item);
+        setTitle(MainActivity.MyItems.get(MainActivity.ItemPosition).Name);
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         ElemMaskDialog = new MyElemMaskDialog();
         ElemMoveDialog = new MyElemMoveDialog();
 
-        TVName = (TextView) findViewById(R.id.textView3);
-        TVName.setText(MainActivity.MyItems.get(MainActivity.ItemPosition).Name);
+        //TVName = (TextView) findViewById(R.id.textView3);
+        //TVName.setText(MainActivity.MyItems.get(MainActivity.ItemPosition).Name);
 
         ItemAdapter = new myItemAdapter(this, MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement);
         lvItem = (ListView) findViewById(R.id.LvItem);
         lvItem.setAdapter(ItemAdapter);
         lvItem.setDivider(getResources().getDrawable(android.R.color.transparent));
 
-        Button BAdd = (Button) findViewById(R.id.BAddItem);
+        //Button BAdd = (Button) findViewById(R.id.BAddItem);
 
         //getElements(Position);
         ItemAdapter.notifyDataSetChanged();
@@ -51,7 +55,7 @@ public class MyItemActivity extends Activity {
                 ElemMaskDialog.show(getFragmentManager(), "");
             }
         };
-        BAdd.setOnClickListener(oclBAdd);
+        //BAdd.setOnClickListener(oclBAdd);
         registerForContextMenu(lvItem);
     }
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenu.ContextMenuInfo menuInfo){
