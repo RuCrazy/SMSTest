@@ -421,7 +421,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                     String receiveString = "";
                     //StringBuilder stringBuilder = new StringBuilder();
-
+                    SettingsHideNullItem = Boolean.parseBoolean(bufferedReader.readLine().toString());
                     while ( (receiveString = bufferedReader.readLine()) != null ) {
                         //stringBuilder.append(receiveString);
                         int num = Integer.parseInt(receiveString.toString());
@@ -481,9 +481,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
 
                 String LS = "\r\n";
-                if (SettingsHideNullItem){
-                    myOutWriter.write("1");
-                }else {myOutWriter.write("0");}
+                myOutWriter.write(SettingsHideNullItem + LS);
                 myOutWriter.write(String.valueOf(MyItems.size()));
                 //Перебираем все элементы MyItems и записываем значения в файл
                 for (int i = 0; i < MyItems.size(); i++){
