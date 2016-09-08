@@ -30,7 +30,7 @@ public class MyItemActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_item);
         setTitle(MainActivity.MyItems.get(MainActivity.ItemPosition).Name);
-        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setIcon(R.drawable.detail);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         ElemMaskDialog = new MyElemMaskDialog();
@@ -83,6 +83,16 @@ public class MyItemActivity extends Activity {
                     return true;
             }
         return super.onContextItemSelected(item);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
     //public void getElements(int Position){
     //    for (int i = 0; i < MainActivity.MyItems.get(Position).MyElement.size(); i++){

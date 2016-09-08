@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"/>
-       // android:orderInCategory="" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/setico"
+        android:showAsAction="always" />
+    <!--android:title="@string/action_settings"-->
     <item android:id="@+id/file_save" android:title="@string/file_save"/>
        // android:orderInCategory="" app:showAsAction="never" />
     <item android:id="@+id/file_read" android:title="@string/file_read"/>
