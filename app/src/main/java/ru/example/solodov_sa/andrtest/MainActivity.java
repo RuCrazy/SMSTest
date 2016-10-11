@@ -49,9 +49,8 @@ import java.util.Date;
 
 public class MainActivity extends Activity implements DatePickerFragment.TheListener {
 
-    Button myBtn;
-    TextView MyTV, MyTV2, MyTV3, TVBalance1, TVBalance2, TVBalance3;
-    Button myBtn2, myBtn3;
+    TextView TVBalance1, TVBalance2, TVBalance3;
+    private Button  myBtn3;
     float Sum, Total;
 
     ArrayAdapter<String> smsadapter;
@@ -111,10 +110,9 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         TVBalance1 = (TextView) findViewById(R.id.textView);
         TVBalance2 = (TextView) findViewById(R.id.textView5);
         TVBalance3 = (TextView) findViewById(R.id.textView6);
-        MyTV2 = (TextView) findViewById(R.id.textView2);
         Button myBtn = (Button) findViewById(R.id.button);
         Button myBtn2 = (Button) findViewById(R.id.button2);
-        Button myBtn3 = (Button) findViewById(R.id.button3);
+        myBtn3 = (Button) findViewById(R.id.button3);
 
         //Номер отправителя SMS
         Sender = "900";
@@ -134,7 +132,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
 
         df = new SimpleDateFormat("MMM.yyyy");
-        MyTV2.setText(df.format(c.getTime()));
+        myBtn3.setText(df.format(c.getTime()));
 
         //Получить список СМС
         GetSMS();
@@ -584,9 +582,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         super.onDestroy();
 
     }
-
-
-    @Override
     public void returnDate(int year, int month, String date) {
         cur_month = month + 1;
         cur_year = year;
@@ -598,7 +593,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         } catch (ParseException e) {
         }
         df = new SimpleDateFormat("MMM.yyyy");
-        MyTV2.setText(df.format(convertedDate));
+        myBtn3.setText(df.format(convertedDate));
         GetSMS();
         GetElements();
         UpdateMyItems();
