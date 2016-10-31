@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Environment;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +56,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     ArrayAdapter<String> smsadapter;
     String Sender, ReqDate, TxtMask, FilePath;
+    static String TAG;
 
     int LastCMVID;
 
@@ -66,7 +68,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     static ArrayList<String> msgData = new ArrayList<String>();
 
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
-    static ArrayList<MyItem> MyItemsHideNull = new ArrayList<MyItem>();
     static myItemsAdapter ItemsAdapter;
 
     DialogFragment ItemsNameDialog;
@@ -98,6 +99,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             }
         });
 
+        TAG = "MyLog";
         Total  = 0;
 
         registerForContextMenu(lvItems);
@@ -213,15 +215,18 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     //Поиск всех объектов element из SMS
     public void GetElements(){
         String str, str2;
+        int k, l;
         boolean f;
+        Log.d(TAG, "Получение элементов из СМС");
         for (int i = 0; i < msgData.size(); i++) {
             str = msgData.get(i);
             str.toLowerCase();
             str2 = str;
+            Log.d(TAG, i + ": " + str);
             if (str.indexOf("покупка") > 0) {
                 str = str.substring(str.indexOf("покупка") + 8);
                 //MyTV.setText(str);
-                str = str.substring(str.indexOf("р")+2);
+                str = str.substring(str.indexOf("р ")+2);
                 //MyTV.setText(MyTV.getText() + " -- " + str);
                 str = str.substring(0,str.indexOf("Баланс")-1);
                 //MyTV.setText(MyTV.getText() + " -- " + str);
@@ -270,11 +275,18 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             if (str2.indexOf("зачисление") > 0) {
                 //str2 = str2.substring(str2.indexOf("зачисление") + 11);
                 //MyTV.setText(str2);
-                str2 = str2.substring(str2.indexOf("р")+2);
-                //MyTV.setText(MyTV.getText() + " -- " + str2);
-                //str2 = str2.substring(0,10);
-                str2 = str2.substring(0,str2.indexOf("Баланс"));
-                //MyTV.setText(MyTV.getText() + " -- " + str2);
+                k = str2.indexOf("р ") + 2;
+                l = str2.indexOf("Баланс");
+                Log.d(TAG, k + " : " + l);
+                if ((l - k) > 1) {
+                    str2.substring(k, l);
+                } else {
+                    str2 = str2.substring(str2.indexOf("зачисление"), k-1);
+                    l = str2.lastIndexOf(" ");
+                    str2 = str2.substring(0, l);
+                    Log.d(TAG, str2 + " : " + l);
+                }
+
                 f = false;
                 for (int n = 0; n < MyItems.size(); n++) {
                     for (int j = 0; j < MyItems.get(n).MyElement.size(); j++) {
@@ -296,6 +308,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         String str, TxtMask;
         int k, l, num;
         float Sum;
+        Log.d(TAG, "Обновление элементов");
 
         for (int i = 0; i < MyItems.size(); i++) {
             Sum = 0;
@@ -311,26 +324,30 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         num ++;
                         k = str.indexOf("покупка");
                         if (k > -1) {
-                            k = k + 8;
-                            l = str.indexOf("р");
+                            l = str.indexOf("р ");
+                            k = str.substring(0 ,l).lastIndexOf(" ");
+                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
                             Sum = Sum + Float.parseFloat(str.substring(k, l));
                         }
                         k = str.indexOf("выдача наличных");
                         if (k > -1) {
-                            k = k + 15;
-                            l = str.indexOf("р");
+                            l = str.indexOf("р ");
+                            k = str.substring(0 ,l).lastIndexOf(" ");
+                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
                             Sum = Sum + Float.parseFloat(str.substring(k, l));
                         }
                         k = str.indexOf("оплата услуг");
                         if (k > -1) {
                             k = k + 12;
-                            l = str.indexOf("р");
+                            l = str.indexOf("р ");
+                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
                             Sum = Sum + Float.parseFloat(str.substring(k, l));
                         }
                         k = str.indexOf("зачисление");
                         if (k > -1) {
-                            k = k + 11;
-                            l = str.indexOf("р");
+                            l = str.indexOf("р ");
+                            k = str.substring(0 ,l).lastIndexOf(" ");
+                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
                             Sum = Sum + Float.parseFloat(str.substring(k, l));
                             //str2 = str.substring(k, l);
                         }
