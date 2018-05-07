@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/tools" tools:context="ru.Card_SMS.solodov_sa.andrtest.MainActivity">
 
     <item android:id="@+id/moveelem" android:title="@string/moveelem"/>
+    <item android:id="@+id/moveelem_other" android:title="@string/moveelem_other"/>
     <item android:id="@+id/delelem" android:title="@string/delelem"/>
     <item android:id="@+id/menu_back" android:title="@string/menu_back"/>
 

@@ -1,4 +1,4 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
 /**
  * Created by solodov_sa on 21.03.2016.

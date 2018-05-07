@@ -1,13 +1,15 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.DialogFragment;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,20 +18,12 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +31,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
@@ -46,17 +39,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MainActivity extends Activity implements DatePickerFragment.TheListener {
 
     TextView TVBalance1, TVBalance2, TVBalance3;
     private Button  myBtn3;
-    float Sum, Total;
+    float Sum, Total, Balance;
+
 
     ArrayAdapter<String> smsadapter;
     String Sender, ReqDate, TxtMask, FilePath;
     static String TAG;
+
+    static String SMS_Permission = Manifest.permission.READ_SMS;
+    static String Storage_Permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    static String strReceipts = "Поступления";
+    static String strOther = "Прочее";
 
     int LastCMVID;
 
@@ -65,7 +66,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     private int cur_year, cur_month, cur_day;
 
-    static ArrayList<String> msgData = new ArrayList<String>();
+    public static ArrayList<msgData> MsgData = new ArrayList<>();
 
     static ArrayList<MyItem> MyItems = new ArrayList<MyItem>();
     static myItemsAdapter ItemsAdapter;
@@ -74,7 +75,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     static int ItemPosition, ElemPosition;
     static  boolean NewItem, SettingsHideNullItem;
+    private static final int SMS_PERMISSION_REQUEST_CODE = 1421, STORAGE_PERMISSION_REQUEST_CODE = 4431, PERMISSION_REQUEST_CODE = 9624;
 
+    public static int SpendTextColour = Resources.getSystem().getColor(android.R.color.holo_red_dark);
+    public static int ReceiptsTextColour =  Resources.getSystem().getColor(android.R.color.holo_blue_light);
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -104,10 +108,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
         registerForContextMenu(lvItems);
 
-        msgData.clear();
-        smsadapter = new ArrayAdapter<String>(this, R.layout.sms_list, msgData);
-        lvMsg = (ListView) findViewById(R.id.lvMsg);
-        lvMsg.setAdapter(smsadapter);
+        MsgData.clear();
+        //smsadapter = new ArrayAdapter<String>(this, R.layout.sms_list, MsgData);
+        //lvMsg = (ListView) findViewById(R.id.lvMsg);
+        //lvMsg.setAdapter(smsadapter);
 
         TVBalance1 = (TextView) findViewById(R.id.textView);
         TVBalance2 = (TextView) findViewById(R.id.textView5);
@@ -137,7 +141,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         myBtn3.setText(df.format(c.getTime()));
 
         //Получить список СМС
-        GetSMS();
+        if (hasPermissions(SMS_Permission)){
+            GetSMS();
+        } else {
+                requestPermissionWithRationale();
+        }
         //Читаем файл настроек
         ReadData();
         ItemOther();
@@ -196,18 +204,18 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         f = false;
         f2 = false;
         for (int i = 0; i < MyItems.size(); i++){
-            if (MyItems.get(i).Name.equals("Прочее")) {
+            if (MyItems.get(i).Name.equals(strOther)) {
                 f = true;
             }
-            if (MyItems.get(i).Name.equals("Поступления")) {
+            if (MyItems.get(i).Name.equals(strReceipts)) {
                 f2 = true;
             }
         }
         if (!f) {
-            AddMyItem(MyItems.size(),"Прочее");
+            AddMyItem(MyItems.size(),strOther);
         }
         if (!f2) {
-            AddMyItem(0,"Поступления");
+            AddMyItem(0,strReceipts);
         }
 
     }
@@ -215,17 +223,21 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     //Поиск всех объектов element из SMS
     public void GetElements(){
         String str, str2;
-        int k, l;
+        int k, l, elemNum;
         boolean f;
-        Log.d(TAG, "Получение элементов из СМС");
-        for (int i = 0; i < msgData.size(); i++) {
-            str = msgData.get(i);
+        elemNum = 0;
+        //Log.d(TAG, "Получение элементов из СМС");
+        for (int i = 0; i < MsgData.size(); i++) {
+            str = MsgData.get(i).Body;
             str.toLowerCase();
             str2 = str;
-            Log.d(TAG, i + ": " + str);
-            if (str.indexOf("покупка") > 0) {
+            //Log.d(TAG, "---------");
+            //Log.d(TAG, "Обрабатываем СМС");
+            //Log.d(TAG, "---------");
+            //Log.d(TAG, i + ": " + str);
+            //Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+            if ((str.indexOf("покупка") > 0) && (str.indexOf("ОТКАЗ") < 0)) {
                 str = str.substring(str.indexOf("покупка") + 8);
-                //MyTV.setText(str);
                 str = str.substring(str.indexOf("р ")+2);
                 //MyTV.setText(MyTV.getText() + " -- " + str);
                 str = str.substring(0,str.indexOf("Баланс")-1);
@@ -242,6 +254,23 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 }
                 if (!f) {
                     AddMyElem(str, MyItems.size()-1);
+                    elemNum ++;
+                }
+
+            }
+            if (str.indexOf("списание")>0){
+                str = "Списание";
+                f = false;
+                for (int n = 0; n < MyItems.size(); n++) {
+                    for (int j = 0; j < MyItems.get(n).MyElement.size(); j++) {
+                        if (str.equals(MyItems.get(n).MyElement.get(j).Mask)) {
+                            f = true;
+                        }
+                    }
+                }
+                if (!f) {
+                    AddMyElem(str, MyItems.size()-1);
+                    elemNum ++;
                 }
             }
             if (str.indexOf("выдача наличных") > 0) {
@@ -256,10 +285,24 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 }
                 if (!f) {
                     AddMyElem(str, MyItems.size()-1);
+                    elemNum ++;
                 }
             }
-            if (str.indexOf("оплата услуг") > 0) {
-                str = str.substring(str.indexOf("оплата услуг"),str.indexOf("оплата услуг") + 12);
+            if ((str.indexOf("оплата") > 0) && (str.indexOf("ОТКАЗ") < 0)){
+
+                Log.d(TAG, "---+++---+++---");
+                Log.d(TAG, "Оплата: " + str);
+                str = str.substring(str.indexOf("оплата") + 6);
+                Log.d(TAG, "Оплата: " + str);
+                str = str.substring(str.indexOf("р ")+2);
+                Log.d(TAG, "Оплата: " + str);
+                if (str.indexOf("Баланс") > 0) {
+                    str = str.substring(0, str.indexOf("Баланс") - 1);
+                } else {
+                    str = "Оплата";
+                }
+                Log.d(TAG, "Оплата: " + str);
+                //str = "Оплата";
                 f = false;
                 for (int n = 0; n < MyItems.size(); n++) {
                     for (int j = 0; j < MyItems.get(n).MyElement.size(); j++) {
@@ -270,37 +313,107 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 }
                 if (!f) {
                     AddMyElem(str, MyItems.size()-1);
+                    elemNum ++;
                 }
             }
-            if (str2.indexOf("зачисление") > 0) {
+            if (str.indexOf("зачисление") > 0) {
                 //str2 = str2.substring(str2.indexOf("зачисление") + 11);
                 //MyTV.setText(str2);
-                k = str2.indexOf("р ") + 2;
-                l = str2.indexOf("Баланс");
-                Log.d(TAG, k + " : " + l);
+                k = str.indexOf("р ") + 2;
+                l = str.indexOf("Баланс");
                 if ((l - k) > 1) {
-                    str2.substring(k, l);
+                    str.substring(k, l);
                 } else {
-                    str2 = str2.substring(str2.indexOf("зачисление"), k-1);
-                    l = str2.lastIndexOf(" ");
-                    str2 = str2.substring(0, l);
-                    Log.d(TAG, str2 + " : " + l);
+                    str = str.substring(str.indexOf("зачисление"), k-1);
+                    l = str.lastIndexOf(" ");
+                    str = str.substring(0, l);
                 }
 
                 f = false;
                 for (int n = 0; n < MyItems.size(); n++) {
                     for (int j = 0; j < MyItems.get(n).MyElement.size(); j++) {
-                        if (str2.equals(MyItems.get(n).MyElement.get(j).Mask)) {
+                        if (str.equals(MyItems.get(n).MyElement.get(j).Mask)) {
                             f = true;
                             //MyTV.setText(str2 + " " + MyItems.size());
                         }
                     }
                 }
                 if (!f) {
-                    AddMyElem(str2, 0);
+                    AddMyElem(str, 0);
+                    elemNum ++;
                 }
             }
+            MsgData.get(i).Mask = str;
+            MsgData.get(i).Sum = GetMsgSum(i);
         }
+        Log.d(TAG, "-------------------");
+        Log.d(TAG, "Добавлено элементов: " + elemNum);
+    }
+    //Находим сумму в сообщении и возвращаем ее
+    public static float GetMsgSum(int i) {
+        String str;
+        int k,l;
+        float Sum;
+        //Log.d(TAG, "---------");
+        //Log.d(TAG, "GetMsgSum " + i);
+        //Log.d(TAG, "---------");
+        Sum = 0.0F;
+        str = MsgData.get(i).Body;
+        k = str.indexOf("покупка");
+        if (k > -1) {
+            l = str.indexOf("р ");
+            k = str.substring(0 ,l).lastIndexOf(" ");
+            //Log.d(TAG, MsgData.get(i).Body);
+            //Log.d(TAG,"Покупка: " + MsgData.get(i).Mask + " : " + str.substring(k, l));
+            Sum = Float.parseFloat(str.substring(k, l));
+        }
+        k = str.indexOf("списание");
+        if (k > -1) {
+            l = str.indexOf("р ");
+            k = str.substring(0, l).lastIndexOf(" ");
+            //Log.d(TAG, MsgData.get(i).Body);
+            //Log.d(TAG, "Выдача наличных: " + MsgData.get(i).Mask + " : " + str.substring(k, l));
+            Sum = Float.parseFloat(str.substring(k, l));
+        }
+        k = str.indexOf("выдача наличных");
+        if (k > -1) {
+            l = str.indexOf("р ");
+            k = str.substring(0 ,l).lastIndexOf(" ");
+            //Log.d(TAG, MsgData.get(i).Body);
+            //Log.d(TAG, "Выдача наличных: " + MsgData.get(i).Mask + " : " + str.substring(k, l));
+            Sum = Float.parseFloat(str.substring(k, l));
+        }
+        k = str.indexOf("оплата");
+        if ((k > -1) && (str.indexOf("ОТКАЗ") < 0)){
+            //k = k + ;
+            //l = str.indexOf("р ");
+            //Log.d(TAG, MsgData.get(i).Body);
+            //Log.d(TAG, "Оплата услуг: " + MsgData.get(i).Mask + " : " + str.substring(k, l));
+            //Sum = Float.parseFloat(str.substring(k, l));
+            Log.d(TAG, str);
+            str = str.substring(k+7);
+            str = str.substring(0, str.lastIndexOf("Баланс")-1);
+            Pattern myPatter = Pattern.compile("(\\d*+\\.)?+\\d+(р)"); //Задаем паттерн для поиска числа целого/дробного с бувой "р" на конце.
+            Matcher myMatcher = myPatter.matcher(str);
+            while (myMatcher.find()) {                                 //Ищем вхождения паттерна в строку.
+                str = myMatcher.group();
+                Sum = Float.parseFloat(str.substring(0, str.length()-1));
+                Log.d(TAG, "----------->" + Sum);
+            }
+        }
+        k = str.indexOf("зачисление");
+        if (k > -1) {
+            l = str.indexOf("р ");
+            k = str.substring(0 ,l).lastIndexOf(" ");
+            //Log.d(TAG, MsgData.get(i).Body);
+            //Log.d(TAG, "Зачисление: " + MsgData.get(i).Mask + " : " + str.substring(k, l));
+            Sum = Float.parseFloat(str.substring(k, l));
+            //str2 = str.substring(k, l);
+        }
+        BigDecimal d = new BigDecimal(String.valueOf(Sum));
+        d = d.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+        Sum = d.floatValue();
+        return Sum;
     }
 
     //Обновление информации MyItems из SMS
@@ -311,56 +424,29 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         Log.d(TAG, "Обновление элементов");
 
         for (int i = 0; i < MyItems.size(); i++) {
-            Sum = 0;
-            num = 0;
+
             for (int n = 0; n < MyItems.get(i).MyElement.size(); n++) {
+                Sum = 0;
+                num = 0;
                 TxtMask = MyItems.get(i).MyElement.get(n).Mask;
                 TxtMask = TxtMask.toLowerCase();
-                for (int j = 0; j < msgData.size(); j++) {
-                    str = msgData.get(j);
+                for (int j = 0; j < MsgData.size(); j++) {
+
+                    str = MsgData.get(j).Mask;
                     str = str.toLowerCase();
 
-                    if (str.indexOf(TxtMask) > 0) {
-                        num ++;
-                        k = str.indexOf("покупка");
-                        if (k > -1) {
-                            l = str.indexOf("р ");
-                            k = str.substring(0 ,l).lastIndexOf(" ");
-                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
-                            Sum = Sum + Float.parseFloat(str.substring(k, l));
-                        }
-                        k = str.indexOf("выдача наличных");
-                        if (k > -1) {
-                            l = str.indexOf("р ");
-                            k = str.substring(0 ,l).lastIndexOf(" ");
-                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
-                            Sum = Sum + Float.parseFloat(str.substring(k, l));
-                        }
-                        k = str.indexOf("оплата услуг");
-                        if (k > -1) {
-                            k = k + 12;
-                            l = str.indexOf("р ");
-                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
-                            Sum = Sum + Float.parseFloat(str.substring(k, l));
-                        }
-                        k = str.indexOf("зачисление");
-                        if (k > -1) {
-                            l = str.indexOf("р ");
-                            k = str.substring(0 ,l).lastIndexOf(" ");
-                            Log.d(TAG, j + ": " + str + " : " + str.substring(k, l));
-                            Sum = Sum + Float.parseFloat(str.substring(k, l));
-                            //str2 = str.substring(k, l);
-                        }
+                    //Log.d(TAG, "-------------------");
+                    //Log.d(TAG, TxtMask + " : " + str);
 
+                    if (str.equals(TxtMask)) {
+                        num ++;
+                        Sum += MsgData.get(j).Sum;
                     }
                 }
-                BigDecimal d = new BigDecimal(String.valueOf(Sum));
-                d = d.setScale(2, BigDecimal.ROUND_HALF_EVEN);
-                Sum = d.floatValue();
+                Log.d(TAG, "-------------------");
+                Log.d(TAG, MyItems.get(i).MyElement.get(n).Mask + ": " + num + " : " + Sum);
                 MyItems.get(i).MyElement.get(n).SmsCount = num;
                 MyItems.get(i).MyElement.get(n).Sum = Sum;
-                num = 0;
-                Sum = 0;
             }
         }
         ItemsAdapter.notifyDataSetChanged();
@@ -378,6 +464,10 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         float j = 0;
         MyElem _Elem = new MyElem(Mask, j, 0);
         MyItems.get(i).MyElement.add(_Elem);
+        Log.d(TAG, "---------");
+        Log.d(TAG, "Добавлен элемент: " + Mask);
+        Log.d(TAG, "---------");
+
     }
     //Перемещение элемента MyElem
     public static void MoveMyElem(int _Elem, int _OldItem, int _NewItem){
@@ -395,8 +485,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         TxtMask = TxtMask.toLowerCase();
 
         if (!TxtMask.equals("")) {
-            for (int i = 0; i < msgData.size(); i++) {
-                str = msgData.get(i);
+            for (int i = 0; i < MsgData.size(); i++) {
+                str = MsgData.get(i).Body;
                 str = str.toLowerCase();
 
                 if (str.indexOf(TxtMask) > 0) {
@@ -468,7 +558,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             catch (FileNotFoundException e) {
                 //Log.e("login activity", "File not found: " + e.toString());
                 Toast.makeText(this, "Файл с настройками не найден: " + e.toString(), Toast.LENGTH_LONG).show();
-                //MyTV.setText("Файл с настройками не найден: " + e.toString());
             } catch (IOException e) {
                 //Log.e("login activity", "Can not read file: " + e.toString());
                 Toast.makeText(this, "Ошибка чтения файла: " + e.toString(), Toast.LENGTH_LONG).show();
@@ -524,18 +613,21 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     private void GetSMS() {
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
-
+        MsgData.clear();
         if (cursor.moveToFirst()) { // must check the result to prevent exception
 
             int i = 0;
             String SmsDate = "";
             // String TxtBody = "";
-            smsadapter.clear();
+            //smsadapter.clear();
+            //Toast.makeText(this,cursor.getString(2),Toast.LENGTH_SHORT).show();
             do {
                 SmsDate = new SimpleDateFormat("MM.yyyy").format(cursor.getLong(5));
                 if (Sender.equals(cursor.getString(2)) && SmsDate.equals(ReqDate))   {
-
-                    smsadapter.add("Дата:" + new SimpleDateFormat("dd.MM.yyyy HH:mm").format(cursor.getLong(5)) + "; От:" + cursor.getString(2) + "; Текст:" + cursor.getString(13));
+                    //smsadapter.add("Дата:" + new SimpleDateFormat("dd.MM.yyyy HH:mm").format(cursor.getLong(5)) + "; От:" + cursor.getString(2) + "; Текст:" + cursor.getString(13));
+                    msgData MData = new msgData((cursor.getString(cursor.getColumnIndexOrThrow("body"))), "", 0F, new SimpleDateFormat("dd.MM.yyyy HH:mm").format(cursor.getLong(5)));
+                    //MsgData.add("Дата:" + new SimpleDateFormat("dd.MM.yyyy HH:mm").format(cursor.getLong(5)) + "; От:" + cursor.getString(2) + "; Текст:" + cursor.getString(cursor.getColumnIndexOrThrow("body")));
+                    MsgData.add(MData);
                     //MyItems.add(new MyItem("Test11111", i, i+i ));
                     i++;
                 }
@@ -545,16 +637,17 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 //}
                 // use msgData
                 //msgData = new String[] {"Дата:" + cursor.getString(5) + "; От:" + cursor.getString(2) + "; Текст:" + cursor.getString(13)};
-
                 //MyTV.setText(msgData);
 
             } while (cursor.moveToNext());
+            Toast.makeText(this,"Получено СМС: " + i,Toast.LENGTH_SHORT).show();
+            GetBalnce();
             //MyTV.setText("Получено " + i + " SMS");
 
         } else {
             // empty box, no SMS
             //MyTV.setText("Список SMS пуст");
-            smsadapter.clear();
+            //smsadapter.clear();
             //lvMsg.setAdapter(adapter);
 
         }
@@ -588,7 +681,11 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         TVBalance1.setText(P + "");
         TVBalance2.setText("-" + R);
         TVBalance3.setText(Total + "");
-        //MyTV3.setText("Приход: " + "\r\n" + "Расход: " + "\r\n" + "Итого: ");
+        if (Total < 0){
+            TVBalance3.setTextColor(SpendTextColour);
+        } else {
+            TVBalance3.setTextColor(ReceiptsTextColour);
+        }
 
     }
 
@@ -683,4 +780,44 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
         return super.onOptionsItemSelected(item);
     }
+
+    private boolean hasPermissions(String Perm){
+        int res = 0;
+        res = checkCallingOrSelfPermission(Perm);
+        if (!(res == PackageManager.PERMISSION_GRANTED)){
+            return false;
+        }
+        return true;
+    }
+    public void requestPermissionWithRationale() {
+        /*if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            final String message = "Storage permission is needed to show files count";
+            Snackbar.make(MainActivity.this.findViewById(R.id.activity_view), message, Snackbar.LENGTH_LONG)
+                    .setAction("GRANT", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            requestPerms();
+                        }
+                    })
+                    .show();
+        } else {
+            requestPerms();
+        }*/
+        requestPerms();
+    }
+    private void requestPerms(){
+        String[] permissions = new String[]{SMS_Permission, Storage_Permission};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(permissions,PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    public void GetBalnce(){
+        String SMSBody;
+        SMSBody = MsgData.get(0).Body;
+        SMSBody = SMSBody.substring(SMSBody.lastIndexOf("Баланс") + 8, SMSBody.lastIndexOf("р"));
+        setTitle(SMSBody);
+    }
+
 }

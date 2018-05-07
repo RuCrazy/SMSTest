@@ -1,4 +1,4 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,14 +12,14 @@ import java.util.ArrayList;
 /**
  * Created by solodov_sa on 04.08.2015.
  */
-public class myItemsAdapter extends BaseAdapter {
+public class myItemAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
-    ArrayList<MyItem> objects;
+    ArrayList<MyElem> objects;
 
-    myItemsAdapter (Context context, ArrayList<MyItem> items) {
+    myItemAdapter(Context context, ArrayList<MyElem> item) {
         ctx = context;
-        objects = items;
+        objects = item;
         lInflater = (LayoutInflater) ctx
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -47,28 +47,27 @@ public class myItemsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // используем созданные, но не используемые view
         View view = convertView;
-        if (view == null) {
+        //if (view == null) {
             view = lInflater.inflate(R.layout.myitems, parent, false);
+        //}
+        MyElem p = getProduct(position);
+
+        if ((p.SmsCount == 0) & (MainActivity.SettingsHideNullItem)){
+            view = lInflater.inflate(R.layout.null_item,parent, false);
+           // view.setVisibility(View.GONE);
+        }else{
+            // заполняем View
+            ((TextView) view.findViewById(R.id.tvName)).setText(p.Mask);
+            ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
+            ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
         }
 
-        MyItem p = getProduct(position);
-
-        // заполняем View
-        float _sum = 0;
-        int _count = 0;
-        ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
-        for (int i = 0; i< p.MyElement.size(); i++ ) {
-            _sum = _sum + p.MyElement.get(i).Sum;
-            _count = _count + p.MyElement.get(i).SmsCount;
-        }
-        ((TextView) view.findViewById(R.id.tvSum)).setText(_sum + " р.");
-        ((TextView) view.findViewById(R.id.tvSmsCount)).setText(_count + "");
         return view;
     }
 
     // товар по позиции
-    MyItem getProduct(int position) {
-        return ((MyItem) getItem(position));
+    MyElem getProduct(int position) {
+        return ((MyElem) getItem(position));
     }
 
 }

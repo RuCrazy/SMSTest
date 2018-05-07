@@ -1,4 +1,4 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
 import android.app.Activity;
 import android.os.Bundle;

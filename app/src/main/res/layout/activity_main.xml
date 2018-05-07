@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context="ru.Card_SMS.solodov_sa.andrtest.MainActivity">
 
     <Button
         android:layout_width="wrap_content"
@@ -29,14 +29,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:visibility="gone" />
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lvMsg"
-        android:layout_below="@+id/button"
-        android:layout_marginTop="20dp"
         android:visibility="gone" />
 
     <Button
@@ -100,36 +92,48 @@
         android:layout_alignParentStart="true" />
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textView"
-        android:gravity="right"
         android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView7"
         android:layout_toRightOf="@+id/textView7"
-        android:layout_toEndOf="@+id/textView7" />
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorLink" />
 
     <TextView
+        android:id="@+id/textView5"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textView5"
-        android:gravity="right"
         android:layout_alignBaseline="@+id/textView7"
         android:layout_alignBottom="@+id/textView7"
+        android:layout_toEndOf="@+id/textView7"
         android:layout_toRightOf="@+id/textView7"
-        android:layout_toEndOf="@+id/textView7" />
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/holo_red_dark" />
 
     <TextView
+        android:id="@+id/textView6"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textView6"
-        android:gravity="right"
         android:layout_alignBaseline="@+id/textView8"
         android:layout_alignBottom="@+id/textView8"
+        android:layout_toEndOf="@+id/textView7"
         android:layout_toRightOf="@+id/textView7"
-        android:layout_toEndOf="@+id/textView7" />
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorLink" />
+
+    <View
+        android:id="@+id/viewSeparator"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_alignStart="@+id/lvItems"
+        android:layout_alignTop="@+id/textView8"
+        android:layout_alignEnd="@+id/textView5"
+        android:background="@drawable/custom_separator_horizontal" />
 
 </RelativeLayout>
     <!--android:background="@drawable/custom_border"-->

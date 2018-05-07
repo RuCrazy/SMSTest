@@ -1,4 +1,4 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
 /**
  * Created by solodov_sa on 21.03.2016.
@@ -30,7 +30,7 @@ public class MyElemMoveDialog extends DialogFragment implements OnClickListener 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().setTitle("Выберите группу");
+        getDialog().setTitle(MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement.get(MainActivity.ElemPosition).Mask);
         View v = inflater.inflate(R.layout.elemmovedialog, null);
         v.findViewById(R.id.emOk).setOnClickListener(this);
         v.findViewById(R.id.emCancel).setOnClickListener(this);

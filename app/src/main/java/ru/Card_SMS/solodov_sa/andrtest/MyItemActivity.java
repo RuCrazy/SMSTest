@@ -1,4 +1,4 @@
-package ru.example.solodov_sa.andrtest;
+package ru.Card_SMS.solodov_sa.andrtest;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -21,6 +21,7 @@ public class MyItemActivity extends Activity {
 
     TextView TVName;
     ListView lvItem;
+    public static String SMSMask;
     static myItemAdapter ItemAdapter;
     //ArrayList<MyElem> MyElements = new ArrayList<MyElem>();
     DialogFragment ElemMaskDialog, ElemMoveDialog;
@@ -49,6 +50,15 @@ public class MyItemActivity extends Activity {
         //getElements(Position);
         ItemAdapter.notifyDataSetChanged();
 
+        lvItem.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent( MyItemActivity.this, mySmsActivity.class);
+                SMSMask = MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement.get(position).Mask;
+                startActivity(intent);
+            }
+        });
+
         View.OnClickListener oclBAdd = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,15 +81,21 @@ public class MyItemActivity extends Activity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         //if (LastCMVID == R.id.lvItems){
             switch (item.getItemId()){
-                case  R.id.delelem:
-                    //Toast.makeText(this,"Удаляем", Toast.LENGTH_LONG).show();
+                case  R.id.delelem: //Удаляем элемент
                     MainActivity.MyItems.get(MainActivity.ItemPosition).MyElement.remove(info.position);
                     MainActivity.ItemsAdapter.notifyDataSetChanged();
                     ItemAdapter.notifyDataSetChanged();
                     return true;
-                case R.id.moveelem:
-                    ElemMoveDialog.show(getFragmentManager(), "");
+                case R.id.moveelem: //Перемещаем элемент
                     MainActivity.ElemPosition = info.position;
+                    ElemMoveDialog.show(getFragmentManager(), "");
+                    return true;
+                case R.id.moveelem_other: //Перемещаем элемент в прочее
+                    if (MainActivity.ItemPosition < MainActivity.MyItems.size() - 1) {
+                        MainActivity.MoveMyElem(info.position, MainActivity.ItemPosition, MainActivity.MyItems.size() - 1);
+                        MainActivity.ItemsAdapter.notifyDataSetChanged();
+                        ItemAdapter.notifyDataSetChanged();
+                    }
                     return true;
             }
         return super.onContextItemSelected(item);
