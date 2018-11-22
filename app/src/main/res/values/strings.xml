@@ -18,6 +18,7 @@
     <string name="prihod">Приход:</string>
     <string name="rashod">Расход:</string>
     <string name="itog">Итого:</string>
-    <string name="NullItems">Скрывать элементы с нулевым значением</string>
+    <string name="HideNullItems">Скрывать элементы с нулевым значением</string>
+    <string name="ShowCurenncy">Отображать символ валюты</string>
     <string name="title_activity_my_sms">MySmsActivity</string>
 </resources>

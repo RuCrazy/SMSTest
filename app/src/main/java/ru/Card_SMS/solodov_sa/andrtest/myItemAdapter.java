@@ -1,6 +1,7 @@
 package ru.Card_SMS.solodov_sa.andrtest;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class myItemAdapter extends BaseAdapter {
         }else{
             // заполняем View
             ((TextView) view.findViewById(R.id.tvName)).setText(p.Mask);
-            ((TextView) view.findViewById(R.id.tvSum)).setText(p.Sum + " р.");
+            ((TextView) view.findViewById(R.id.tvSum)).setText(MainActivity.TwoDecFormat.format(p.Sum) + MainActivity.curenncy);
             ((TextView) view.findViewById(R.id.tvSmsCount)).setText(p.SmsCount + "");
         }
 

@@ -1,12 +1,14 @@
 package ru.Card_SMS.solodov_sa.andrtest;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -59,9 +61,13 @@ public class myItemsAdapter extends BaseAdapter {
         ((TextView) view.findViewById(R.id.tvName)).setText(p.Name);
         for (int i = 0; i< p.MyElement.size(); i++ ) {
             _sum = _sum + p.MyElement.get(i).Sum;
+
             _count = _count + p.MyElement.get(i).SmsCount;
         }
-        ((TextView) view.findViewById(R.id.tvSum)).setText(_sum + " р.");
+        BigDecimal d = new BigDecimal(String.valueOf(_sum));
+        d = d.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+        _sum = d.floatValue();
+        ((TextView) view.findViewById(R.id.tvSum)).setText(MainActivity.TwoDecFormat.format(_sum) + MainActivity.curenncy );
         if (p.Name.equals(MainActivity.strReceipts)) {
             ((TextView) view.findViewById(R.id.tvSum)).setTextColor(MainActivity.ReceiptsTextColour);
         } else {
