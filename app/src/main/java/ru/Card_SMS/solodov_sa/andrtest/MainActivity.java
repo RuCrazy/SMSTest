@@ -576,39 +576,59 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                     String receiveString = "";
                     //StringBuilder stringBuilder = new StringBuilder();
-                    Log.d(TAG, "Чтение первой строки из файла");
-                    Card = bufferedReader.readLine();
-                    Log.d(TAG, "Card: " + Card);
-                    SettingsHideNullItem = Boolean.parseBoolean(bufferedReader.readLine().toString());
-                    Log.d(TAG, "SettingsHideNullItem: " + SettingsHideNullItem);
-                    settingsShowCurenncy = Boolean.parseBoolean(bufferedReader.readLine().toString());
-                    Log.d(TAG, "settingsShowCurenncy: " + settingsShowCurenncy );
-                    curenncyPosition = Integer.parseInt(bufferedReader.readLine().toString());
-                    Log.d(TAG, "curenncyPosition: " + curenncyPosition);
-                    SetCurenncy();
-                    while ( (receiveString = bufferedReader.readLine()) != null ) {
-                        //stringBuilder.append(receiveString);
-                        int num = Integer.parseInt(receiveString.toString());
-                        Log.d(TAG, "Прочитали: " + num);
-                        if (num != 0){
-                            for (int i = 0; i <= num-1; i++) {
-                                String name = bufferedReader.readLine();
-                                AddMyItem(MyItems.size(),name);
-                               // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
-                               // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
-                                //ArrayList<String> MA = new ArrayList<String>();
-                                int num2 = Integer.parseInt(bufferedReader.readLine().toString());
-                                for (int j = 0; j <= num2-1; j++) {
-                                    String Mask = bufferedReader.readLine().toString();
-                                    //AddMyItems(MA.get(j));
-                                    AddMyElem(Mask, i);
+                        Log.d(TAG, "Чтение первой строки из файла");
+                        try {
+                            Card = bufferedReader.readLine();
+                        } catch (Exception e){
+                            Log.e(TAG, "Ошибка: " + e.toString());
+                            Card = "visa";
+                        }
+                        Log.d(TAG, "Card: " + Card);
+                        try {
+                            SettingsHideNullItem = Boolean.parseBoolean(bufferedReader.readLine());
+                        } catch (Exception e){
+                            Log.e(TAG, "Ошибка: " + e.toString());
+                            SettingsHideNullItem = true;
+                        }
+                        Log.d(TAG, "SettingsHideNullItem: " + SettingsHideNullItem);
+                        try {
+                            settingsShowCurenncy = Boolean.parseBoolean(bufferedReader.readLine());
+                        } catch (Exception e){
+                            Log.e(TAG, "Ошибка: " + e.toString());
+                            settingsShowCurenncy = false;
+                        }
+                        Log.d(TAG, "settingsShowCurenncy: " + settingsShowCurenncy );
+                        try {
+                            curenncyPosition = Integer.parseInt(bufferedReader.readLine());
+                        } catch (Exception e){
+                            Log.e(TAG, "Ошибка: " + e.toString());
+                            curenncyPosition = 0;
+                        }
+                        Log.d(TAG, "curenncyPosition: " + curenncyPosition);
+                        SetCurenncy();
+                        while ( (receiveString = bufferedReader.readLine()) != null ) {
+                            //stringBuilder.append(receiveString);
+                            int num = Integer.parseInt(receiveString);
+                            Log.d(TAG, "Прочитали: " + num);
+                            if (num != 0){
+                                for (int i = 0; i <= num-1; i++) {
+                                    String name = bufferedReader.readLine();
+                                    AddMyItem(MyItems.size(),name);
+                                   // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
+                                   // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
+                                    //ArrayList<String> MA = new ArrayList<String>();
+                                    int num2 = Integer.parseInt(bufferedReader.readLine());
+                                    for (int j = 0; j <= num2-1; j++) {
+                                        String Mask = bufferedReader.readLine();
+                                        //AddMyItems(MA.get(j));
+                                        AddMyElem(Mask, i);
+                                    }
+                                   // MyItems.add(new MyItem(name, MA, sum, SmsCount));
                                 }
-                               // MyItems.add(new MyItem(name, MA, sum, SmsCount));
+
                             }
 
                         }
-
-                    }
 
                     inStream.close();
                     //ret = stringBuilder.toString();
