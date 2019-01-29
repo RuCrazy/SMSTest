@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -55,7 +54,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
     static DecimalFormat TwoDecFormat;
 
     ArrayAdapter<String> smsadapter;
-    String Sender, ReqDate, TxtMask, FilePath;
+    String Sender, ReqDate, TxtMask, FilePathSettings, FilePathData;
     static String TAG;
 
     static String Card = "visa";
@@ -157,7 +156,8 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         Sum = 0;
 
 
-        FilePath = getExternalFilesDir(null).toString()+ "/Settings.txt" ;
+        FilePathSettings = getExternalFilesDir(null).toString()+ "/Settings.txt" ;
+        FilePathData = getExternalFilesDir(null).toString()+ "/Data.txt" ;
 
 
         df = new SimpleDateFormat("MMM.yyyy");
@@ -177,7 +177,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
         }
         UpdateMyItems();
         CalculateTotal();
-        // MyTV.setText(FilePath);
+        // MyTV.setText(FilePathSettings);
 
 
         //Нажатие на кнопку "Добавить"
@@ -560,13 +560,13 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
 
     //чтение файла с настройками
      private void ReadData() {
-        Log.d(TAG, "ReadData Start");
+        Log.d(TAG, "ReadSettings Start");
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
             Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
             return;
         } else {
-            File fhandle = new File(FilePath);
+            File fhandle = new File(FilePathSettings);
             try {
                 FileInputStream inStream = new FileInputStream(fhandle);
 
@@ -606,29 +606,6 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                         }
                         Log.d(TAG, "curenncyPosition: " + curenncyPosition);
                         SetCurenncy();
-                        while ( (receiveString = bufferedReader.readLine()) != null ) {
-                            //stringBuilder.append(receiveString);
-                            int num = Integer.parseInt(receiveString);
-                            Log.d(TAG, "Прочитали: " + num);
-                            if (num != 0){
-                                for (int i = 0; i <= num-1; i++) {
-                                    String name = bufferedReader.readLine();
-                                    AddMyItem(MyItems.size(),name);
-                                   // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
-                                   // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
-                                    //ArrayList<String> MA = new ArrayList<String>();
-                                    int num2 = Integer.parseInt(bufferedReader.readLine());
-                                    for (int j = 0; j <= num2-1; j++) {
-                                        String Mask = bufferedReader.readLine();
-                                        //AddMyItems(MA.get(j));
-                                        AddMyElem(Mask, i);
-                                    }
-                                   // MyItems.add(new MyItem(name, MA, sum, SmsCount));
-                                }
-
-                            }
-
-                        }
 
                     inStream.close();
                     //ret = stringBuilder.toString();
@@ -642,7 +619,59 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 //Log.e("login activity", "Can not read file: " + e.toString());
                 Toast.makeText(this, "Ошибка чтения файла: " + e.toString(), Toast.LENGTH_LONG).show();
             }
-       }
+        }
+         Log.d(TAG, "ReadData Start");
+         if (!Environment.getExternalStorageState().equals(
+                 Environment.MEDIA_MOUNTED)) {
+             Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
+             return;
+         } else {
+             File fhandle = new File(FilePathData);
+             try {
+                 FileInputStream inStream = new FileInputStream(fhandle);
+
+                 if ( inStream != null ) {
+                     MyItems.clear();
+                     InputStreamReader inputStreamReader = new InputStreamReader(inStream);
+                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                     String receiveString = "";
+                     while ( (receiveString = bufferedReader.readLine()) != null ) {
+                         //stringBuilder.append(receiveString);
+                         int num = Integer.parseInt(receiveString);
+                         Log.d(TAG, "Прочитали: " + num);
+                         if (num != 0){
+                             for (int i = 0; i <= num-1; i++) {
+                                 String name = bufferedReader.readLine();
+                                 AddMyItem(MyItems.size(),name);
+                                 // int SmsCount = Integer.parseInt(bufferedReader.readLine().toString());
+                                 // Float sum = Float.parseFloat(bufferedReader.readLine().toString());
+                                 //ArrayList<String> MA = new ArrayList<String>();
+                                 int num2 = Integer.parseInt(bufferedReader.readLine());
+                                 for (int j = 0; j <= num2-1; j++) {
+                                     String Mask = bufferedReader.readLine();
+                                     //AddMyItems(MA.get(j));
+                                     AddMyElem(Mask, i);
+                                 }
+                                 // MyItems.add(new MyItem(name, MA, sum, SmsCount));
+                             }
+
+                         }
+
+                     }
+
+                     inStream.close();
+                     //ret = stringBuilder.toString();
+                 }
+
+             }
+             catch (FileNotFoundException e) {
+                 //Log.e("login activity", "File not found: " + e.toString());
+                 Toast.makeText(this, "Файл с настройками не найден: " + e.toString(), Toast.LENGTH_LONG).show();
+             } catch (IOException e) {
+                 //Log.e("login activity", "Can not read file: " + e.toString());
+                 Toast.makeText(this, "Ошибка чтения файла: " + e.toString(), Toast.LENGTH_LONG).show();
+             }
+         }
         Log.d(TAG, "ReadData End");
     }
     //Запись файла с настройками
@@ -653,7 +682,7 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
             return;
         } else {
 
-            File fhandle = new File(FilePath);
+            File fhandle = new File(FilePathSettings);
             try
             {
                 //Если нет директорий в пути, то они будут созданы:
@@ -670,12 +699,43 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 myOutWriter.write(SettingsHideNullItem + LS);
                 myOutWriter.write(settingsShowCurenncy + LS);
                 myOutWriter.write(curenncyPosition + LS);
+                myOutWriter.close();
+                fOut.close();
+
+                //Toast.makeText(this, "Файл записан на SD-карту" + FilePathSettings, Toast.LENGTH_LONG).show();
+            }
+            catch (IOException e)
+            {
+                //e.printStackTrace();
+                //Toast.makeText(this,"Path " + FilePathSettings + ", " + e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Ошибка записи файла: " + e.toString(), Toast.LENGTH_LONG).show();
+            }
+        }
+        if (!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            Toast.makeText(this, "SD-карта не доступна: " + Environment.getExternalStorageState(), Toast.LENGTH_LONG).show();
+            return;
+        } else {
+
+            File fhandle = new File(FilePathData);
+            try
+            {
+                //Если нет директорий в пути, то они будут созданы:
+                if (!fhandle.getParentFile().exists()) {
+                    fhandle.getParentFile().mkdirs();
+                }
+                //Если файл существует, то он будет перезаписан:
+                fhandle.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(fhandle);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+
+                String LS = "\r\n";
                 myOutWriter.write(String.valueOf(MyItems.size()));
                 //Перебираем все элементы MyItems и записываем значения в файл
                 for (int i = 0; i < MyItems.size(); i++){
                     myOutWriter.write(LS + MyItems.get(i).Name);
-                   // myOutWriter.write(LS + MyItems.get(i).SmsCount);
-                   // myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
+                    // myOutWriter.write(LS + MyItems.get(i).SmsCount);
+                    // myOutWriter.write(LS + String.valueOf(MyItems.get(i).Sum));
                     myOutWriter.write(LS + String.valueOf(MyItems.get(i).MyElement.size()));
                     for (int j = 0; j < MyItems.get(i).MyElement.size(); j++){
                         myOutWriter.write(LS + MyItems.get(i).MyElement.get(j).Mask);
@@ -684,12 +744,12 @@ public class MainActivity extends Activity implements DatePickerFragment.TheList
                 myOutWriter.close();
                 fOut.close();
 
-                //Toast.makeText(this, "Файл записан на SD-карту" + FilePath, Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Файл записан на SD-карту" + FilePathSettings, Toast.LENGTH_LONG).show();
             }
             catch (IOException e)
             {
                 //e.printStackTrace();
-                //Toast.makeText(this,"Path " + FilePath + ", " + e.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this,"Path " + FilePathSettings + ", " + e.toString(), Toast.LENGTH_LONG).show();
                 Toast.makeText(this,"Ошибка записи файла: " + e.toString(), Toast.LENGTH_LONG).show();
             }
         }
